@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo ao camsmonteiro.ddns.net</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+        
+        .welcome-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        
+        .logo {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feature h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .feature p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .status {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .info-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <div class="logo">🎥 camsmonteiro.ddns.net</div>
+        <div class="subtitle">Sistema de Monitoramento RTSP com IA</div>
+        
+        <div class="status">
+            <span class="status-icon">✅</span>
+            <strong>Sistema Online</strong> - Gravações e monitoramento ativos
+        </div>
+        
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">📹 Gravações</div>
+                <div>2 vídeos disponíveis</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">🌐 Domínio</div>
+                <div>camsmonteiro.ddns.net</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">📅 Data</div>
+                <div id="current-date"></div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">⏰ Hora</div>
+                <div id="current-time"></div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <h3>📹 Gravações</h3>
+                <p>Acesse e gerencie suas gravações com organização por data</p>
+            </div>
+            <div class="feature">
+                <h3>🔍 Busca Inteligente</h3>
+                <p>Encontre vídeos por data, mês ou ano rapidamente</p>
+            </div>
+            <div class="feature">
+                <h3>📱 Responsivo</h3>
+                <p>Acesse de qualquer dispositivo móvel ou desktop</p>
+            </div>
+            <div class="feature">
+                <h3>🔒 Seguro</h3>
+                <p>Sistema com autenticação e controle de acesso</p>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <a href="/recordings" class="btn btn-primary">📹 Acessar Gravações</a>
+            <a href="/login" class="btn btn-secondary">🔐 Login</a>
+            <a href="/api/system/status" class="btn btn-secondary" target="_blank">📊 Status</a>
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #999;">
+            <p>🌐 Acesse de qualquer lugar: <strong>http://camsmonteiro.ddns.net:5000</strong></p>
+            <p>📱 Rede Local: <strong>http://192.168.1.152:5000</strong></p>
+        </div>
+    </div>
+    
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('pt-BR');
+            const timeStr = now.toLocaleTimeString('pt-BR');
+            
+            document.getElementById('current-date').textContent = dateStr;
+            document.getElementById('current-time').textContent = timeStr;
+        }
+        
+        // Atualizar data/hora imediatamente e depois a cada segundo
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        
+        // Adicionar animação suave ao carregar
+        window.addEventListener('load', function() {
+            document.querySelector('.welcome-container').style.opacity = '0';
+            document.querySelector('.welcome-container').style.transform = 'translateY(20px)';
+            document.querySelector('.welcome-container').style.transition = 'all 0.6s ease';
+            
+            setTimeout(function() {
+                document.querySelector('.welcome-container').style.opacity = '1';
+                document.querySelector('.welcome-container').style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

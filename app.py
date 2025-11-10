@@ -220,6 +220,12 @@ def login():
     
     return render_template('login.html')
 
+@app.route('/camsmonteiro')
+@app.route('/welcome')
+def camsmonteiro_welcome():
+    """Página de boas-vindas especial para camsmonteiro.ddns.net"""
+    return render_template('camsmonteiro_welcome.html')
+
 @app.route('/logout')
 @login_required
 def logout():
