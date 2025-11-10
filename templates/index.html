@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Monitoramento IA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 10px;">
+                <rect x="2" y="2" width="20" height="16" rx="2" ry="2"></rect>
+                <circle cx="8" cy="10" r="2"></circle>
+                <path d="M16 10l2-2 2 2-2 2-2-2z"></path>
+            </svg>
+            Centro de Monitoramento IA
+        </h1>
+            <div class="header-info">
+                <span id="current-time"></span>
+                <a href="{{ url_for('logout') }}" class="btn-logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Sair
+                </a>
+                <a href="{{ url_for('alerts') }}" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    Alertas
+                </a>
+                <a href="{{ url_for('settings') }}" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    Configurações
+                </a>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="video-section">
+                <div class="video-container">
+                    <img id="video-stream" src="{{ url_for('video_feed') }}" alt="Stream da Câmera">
+                    
+                    <div class="video-overlay">
+                        <div class="status-indicator" id="status-indicator">
+                            <span class="status-dot" id="status-dot"></span>
+                            <span id="status-text">Monitorando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="panel">
+                    <h3>📊 Status do Sistema</h3>
+                    <div class="status-item">
+                        <span>Conexão:</span>
+                        <span class="status-indicator" id="camera-status">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                            </svg>
+                        </span>
+                        <span class="status-ok">Online</span>
+                    </div>
+                    <div class="status-item">
+                        <span>IA YOLOv8:</span>
+                        <span class="status-ok">✅ Ativa</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Detecção de Movimento:</span>
+                        <span id="motion-status">⏸️ Inativa</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Pessoa Detectada:</span>
+                        <span id="person-status">❌ Não</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Última Detecção:</span>
+                        <span id="last-detection">--:--:--</span>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>⚙️ Controles</h3>
+                    <button id="btn-config" class="btn-control">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                            <rect x="2" y="2" width="20" height="16" rx="2" ry="2"></rect>
+                            <circle cx="8" cy="10" r="2"></circle>
+                            <path d="M16 10l2-2 2 2-2 2-2-2z"></path>
+                        </svg>
+                        Configurar Câmera
+                    </button>
+                    <div class="alert-controls">
+                        <button id="view-alerts-btn" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            Ver Alertas Salvos
+                        </button>
+                        <button id="btn-alerts" class="btn-control">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            Configurar Alertas
+                        </button>
+                    </div>
+                    <button id="btn-record" class="btn-control">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <circle cx="12" cy="12" r="4"></circle>
+                          </svg>
+                          Gravar
+                      </button>
+                    <button id="btn-settings" class="btn-control">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                              <circle cx="12" cy="12" r="3"></circle>
+                              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V12a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                          </svg>
+                          Configurações
+                      </button>
+                </div>
+
+                <div class="panel">
+                    <h3>📈 Estatísticas</h3>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="motion-count">0</span>
+                            <span class="stat-label">Movimentos</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="person-count">0</span>
+                            <span class="stat-label">Pessoas</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="alert-count">0</span>
+                            <span class="stat-label">Alertas</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Configuração -->
+        <div id="config-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>📹 Configurar Câmera RTSP</h2>
+                <form id="config-form">
+                    <div class="form-group">
+                        <label for="rtsp-url">URL RTSP:</label>
+                        <input type="text" id="rtsp-url" name="rtsp_url" 
+                               placeholder="rtsp://usuario:senha@ip:554/stream">
+                        <small>Formato: rtsp://usuario:senha@endereco_ip:porta/caminho</small>
+                    </div>
+                    <button type="submit" class="btn-save">💾 Salvar Configurações</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Atualizar relógio
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleString('pt-BR');
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Contadores
+        let motionCount = 0;
+        let personCount = 0;
+        let alertCount = 0;
+
+        // Atualizar status
+        function updateStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    const statusDot = document.getElementById('status-dot');
+                    const statusText = document.getElementById('status-text');
+                    const motionStatus = document.getElementById('motion-status');
+                    const personStatus = document.getElementById('person-status');
+                    const lastDetection = document.getElementById('last-detection');
+
+                    if (data.person_detected) {
+                        statusDot.className = 'status-dot danger';
+                        statusText.textContent = 'PESSOA DETECTADA!';
+                        personStatus.innerHTML = '⚠️ <strong>Sim</strong>';
+                        personCount++;
+                        alertCount++;
+                        document.getElementById('person-count').textContent = personCount;
+                        document.getElementById('alert-count').textContent = alertCount;
+                    } else if (data.motion_detected) {
+                        statusDot.className = 'status-dot warning';
+                        statusText.textContent = 'MOVIMENTO DETECTADO';
+                        motionStatus.innerHTML = '⚠️ <strong>Ativa</strong>';
+                        motionCount++;
+                        document.getElementById('motion-count').textContent = motionCount;
+                    } else {
+                        statusDot.className = 'status-dot success';
+                        statusText.textContent = 'Monitorando...';
+                        motionStatus.innerHTML = '⏸️ Inativa';
+                        personStatus.innerHTML = '❌ Não';
+                    }
+
+                    if (data.timestamp) {
+                        lastDetection.textContent = data.timestamp.split(' ')[1];
+                    }
+                    
+                    // Atualizar estatísticas de alertas se disponíveis
+                    if (data.alert_stats) {
+                        console.log('Estatísticas de alertas:', data.alert_stats);
+                    }
+                })
+                .catch(error => console.error('Erro ao obter status:', error));
+        }
+
+        // Atualizar status a cada 2 segundos
+        setInterval(updateStatus, 2000);
+
+        // Modal de configuração
+        const modal = document.getElementById('config-modal');
+        const btnConfig = document.getElementById('btn-config');
+        const span = document.getElementsByClassName('close')[0];
+
+        btnConfig.onclick = function() {
+            modal.style.display = 'block';
+            // Carregar configuração atual
+            fetch('/config')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('rtsp-url').value = data.rtsp_url || '';
+                });
+        }
+
+        span.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Formulário de configuração
+        document.getElementById('config-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch('/config', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || 'Configuração salva com sucesso!');
+                modal.style.display = 'none';
+            })
+            .catch(error => {
+                alert('Erro ao salvar configuração');
+                console.error('Erro:', error);
+            });
+        });
+
+        // Botão ver alertas
+        document.getElementById('view-alerts-btn').addEventListener('click', function() {
+            window.location.href = '/alerts';
+        });
+
+        // Botão configurar alertas (existente)
+        document.getElementById('btn-alerts').addEventListener('click', function() {
+            window.open('/alerts', '_blank');
+        });
+
+        // Botão de gravação
+        document.getElementById('btn-record').addEventListener('click', function() {
+            alert('Função de gravação será implementada em breve!');
+        });
+
+        // Botão configurações
+        document.getElementById('btn-settings').addEventListener('click', function() {
+            window.location.href = '/settings';
+        });
+    </script>
+</body>
+</html>

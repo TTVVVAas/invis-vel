@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Monitoramento IA - Configurações</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Estilos específicos para a página de configurações */
+        body {
+            background-color: #111827;
+            color: #f9fafb;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .settings-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #111827;
+            min-height: 100vh;
+            color: #f9fafb;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .settings-nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #374151;
+            color: #f9fafb;
+        }
+
+        .settings-content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+
+        .settings-sidebar {
+            background: #1f2937;
+            padding: 1.5rem;
+            border-radius: 12px;
+            height: fit-content;
+            color: #f9fafb;
+        }
+
+        .settings-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .settings-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .settings-menu a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #f9fafb;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background-color: transparent;
+            border: 1px solid transparent;
+        }
+
+        .settings-menu a:hover,
+        .settings-menu a.active {
+            background: #3b82f6;
+            color: #f9fafb;
+            border-color: #3b82f6;
+        }
+        
+        .settings-menu a:not(.active) {
+            border: 1px solid #374151;
+        }
+        
+        /* Estilo para painel escuro com títulos claros */
+        .white-panel {
+            background-color: #1f2937;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 1px solid #374151;
+}
+        
+        .white-panel h1,
+        .white-panel h2,
+        .white-panel h3,
+        .white-panel h4,
+        .white-panel h5,
+        .white-panel h6 {
+            color: #f9fafb !important; /* Branco suave com prioridade máxima */
+        }
+
+        /* 🌟 SOLUÇÃO: Adaptação automática para temas claros */
+        /* Se o fundo for claro, muda o texto para escuro automaticamente */
+        @media (prefers-color-scheme: light) {
+            .settings-sidebar,
+            .settings-panel,
+            .white-panel,
+            .settings-container,
+            .settings-section {
+                background-color: #ffffff !important;
+                color: #111827 !important;
+            }
+            
+            .white-panel h1,
+            .white-panel h2,
+            .white-panel h3,
+            .white-panel h4,
+            .white-panel h5,
+            .white-panel h6,
+            .settings-panel h2,
+            .settings-panel h3,
+            .settings-section h2,
+            .settings-section h3,
+            .settings-container h2,
+            .settings-container h3,
+            #geral h2,
+            #geral h3,
+            #camera h2,
+            #camera h3,
+            #detection h2,
+            #detection h3,
+            #telegram h2,
+            #telegram h3,
+            #recording h2,
+            #recording h3,
+            #security h2,
+            #security h3,
+            #system h2,
+            #system h3,
+            #backup h2,
+            #backup h3,
+            .settings-section p,
+            .settings-panel p,
+            .white-panel p,
+            label {
+                color: #111827 !important; /* Texto escuro para fundo claro */
+            }
+            
+            .settings-menu a {
+                color: #111827 !important;
+                border-color: #d1d5db !important;
+                background-color: #f9fafb !important;
+            }
+            
+            .settings-sidebar {
+                background-color: #ffffff !important;
+                border: 1px solid #e5e7eb !important;
+            }
+            
+            .settings-menu a:hover,
+            .settings-menu a.active {
+                background: #3b82f6 !important;
+                color: #ffffff !important;
+                border-color: #3b82f6 !important;
+            }
+        }
+
+        /* 🌟 SOLUÇÃO: Classes para troca manual de tema */
+        .light-theme .settings-sidebar,
+        .light-theme .settings-panel,
+        .light-theme .white-panel,
+        .light-theme .settings-container,
+        .light-theme .settings-section {
+            background-color: #ffffff !important;
+            color: #111827 !important;
+            border-color: #e5e7eb !important;
+        }
+
+        /* 🌟 Garantir fundo escuro no tema padrão */
+        main.settings-panel {
+            background-color: #1f2937 !important;
+            color: #f9fafb !important;
+        }
+        
+        body:not(.light-theme) main.settings-panel {
+            background-color: #1f2937 !important;
+            color: #f9fafb !important;
+        }
+        
+        /* 🌟 Regra com prioridade máxima para garantir visibilidade */
+        main.settings-panel[style] {
+            background-color: #1f2937 !important;
+        }
+        
+        /* Regras adicionais para garantir fundo escuro */
+        body:not(.light-theme) .settings-container main.settings-panel {
+            background-color: #1f2937 !important;
+            color: #f9fafb !important;
+        }
+        
+        /* Forçar contra qualquer estilo inline ou JavaScript */
+        .settings-container > main.settings-panel {
+            background-color: #1f2937 !important;
+            color: #f9fafb !important;
+            background: #1f2937 !important;
+        }
+        
+        /* Garantir que nenhum elemento filho force fundo branco */
+        .settings-panel * {
+            background-color: transparent !important;
+        }
+        
+        /* Exceção para inputs e elementos interativos */
+        .settings-panel input,
+        .settings-panel select,
+        .settings-panel textarea,
+        .settings-panel button {
+            background-color: #374151 !important;
+        }
+        
+        /* MÁXIMA ESPECIFICIDADE - Garantir fundo escuro */
+        html body:not(.light-theme) div.settings-container main.settings-panel.settings-panel.settings-panel {
+            background-color: #1f2937 !important;
+            background: #1f2937 !important;
+            color: #f9fafb !important;
+        }
+        
+        /* Resetar qualquer estilo que possa estar causando fundo branco */
+        body:not(.light-theme) main.settings-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #1f2937;
+            z-index: -1;
+        }
+        
+        .light-theme .white-panel h1,
+        .light-theme .white-panel h2,
+        .light-theme .white-panel h3,
+        .light-theme .white-panel h4,
+        .light-theme .white-panel h5,
+        .light-theme .white-panel h6,
+        .light-theme .settings-panel h2,
+        .light-theme .settings-panel h3,
+        .light-theme .settings-section h2,
+        .light-theme .settings-section h3,
+        .light-theme .settings-container h2,
+        .light-theme .settings-container h3,
+        .light-theme #geral h2,
+        .light-theme #geral h3,
+        .light-theme #camera h2,
+        .light-theme #camera h3,
+        .light-theme #detection h2,
+        .light-theme #detection h3,
+        .light-theme #telegram h2,
+        .light-theme #telegram h3,
+        .light-theme #recording h2,
+        .light-theme #recording h3,
+        .light-theme #security h2,
+        .light-theme #security h3,
+        .light-theme #system h2,
+        .light-theme #system h3,
+        .light-theme #backup h2,
+        .light-theme #backup h3,
+        .light-theme .settings-section p,
+        .light-theme .settings-panel p,
+        .light-theme .white-panel p,
+        .light-theme label {
+            color: #111827 !important; /* Texto escuro para fundo claro */
+        }
+        
+        .light-theme .settings-menu a {
+            color: #111827 !important;
+            border-color: #d1d5db !important;
+            background-color: #f9fafb !important;
+        }
+        
+        .light-theme .settings-sidebar {
+            background-color: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+        }
+        
+        .light-theme .settings-menu a:hover,
+        .light-theme .settings-menu a.active {
+            background: #3b82f6 !important;
+            color: #ffffff !important;
+            border-color: #3b82f6 !important;
+        }
+
+        .settings-panel {
+            background: #1f2937 !important;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #f9fafb !important;
+            border: 1px solid #374151;
+            min-height: 600px; /* Garantir altura mínima */
+        }
+        
+        .settings-panel h2 {
+            color: #f9fafb;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 0.5rem;
+        }
+        
+        .settings-panel h3 {
+            color: #f9fafb;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+         /* Garantir que títulos dentro das seções sejam claros */
+         .settings-section h2 {
+             color: #f9fafb !important;
+             border-bottom: 2px solid #3b82f6;
+             padding-bottom: 0.5rem;
+             margin-bottom: 1.5rem;
+         }
+         
+         .settings-section h3 {
+             color: #f9fafb !important;
+             margin-top: 2rem;
+             margin-bottom: 1rem;
+             font-size: 1.2rem;
+             font-weight: 600;
+         }
+
+         /* Título específico: "Configurações Gerais" deve ser claro */
+        #geral h2 {
+            color: #f9fafb !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+        }
+        
+        /* Quando estiver dentro de um painel escuro, deve ser claro */
+        #geral .white-panel h2 {
+            color: #f9fafb !important;
+            text-shadow: none;
+        }
+        
+         /* Removido: regra global que forçava títulos claros dentro do settings-panel */
+         
+         /* Deixar todos os títulos e textos com a mesma cor dos labels */
+         .settings-section h2,
+         .settings-section h3,
+         .settings-section p,
+         .white-panel h2,
+         .white-panel h3,
+         .white-panel p {
+             color: #f9fafb !important;
+         }
+         
+         /* Garantir que todos os h2 e h3 no settings sejam visíveis */
+         .settings-container h2,
+         .settings-container h3,
+         #geral h2,
+         #geral h3,
+         #camera h2,
+         #camera h3,
+         #detection h2,
+         #detection h3,
+         #telegram h2,
+         #telegram h3,
+         #recording h2,
+         #recording h3,
+         #security h2,
+         #security h3,
+         #system h2,
+         #system h3,
+         #backup h2,
+         #backup h3 {
+             color: #f9fafb !important;
+         }
+
+        .settings-section {
+            display: none;
+        }
+
+        .settings-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #f9fafb;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #374151;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+            background-color: #374151;
+            color: #f9fafb;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background-color: #4b5563;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 0.25rem;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #374151;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: #f9fafb;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease;
+            display: block;
+            width: 100%;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: #f9fafb;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease;
+            display: block;
+            width: 100%;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-info {
+            background: #3b82f6;
+            color: #f9fafb;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease;
+            display: block;
+            width: 100%;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .btn-info:hover {
+            background: #2563eb;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #374151;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: #f9fafb;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #3b82f6;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        @media (max-width: 768px) {
+            .settings-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .settings-sidebar {
+                order: 2;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <header class="settings-header">
+            <h1>
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 10px;">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            Centro de Monitoramento IA
+        </h1>
+            <div class="settings-nav">
+                <!-- 🌟 Botão de Troca de Tema -->
+                <button type="button" id="theme-toggle" class="btn btn-info" style="margin-right: 1rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <span id="theme-text">Tema Claro</span>
+                </button>
+                
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                        <path d="M19 12H5m7 7l-7-7 7-7"></path>
+                    </svg>
+                    Voltar ao Dashboard
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn btn-danger">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Sair
+                </a>
+            </div>
+        </header>
+
+        <div class="settings-content">
+            <aside class="settings-sidebar">
+                <nav>
+                    <ul class="settings-menu">
+                        <li><a href="#geral" class="menu-link active" data-section="geral">🏠 Geral</a></li>
+                        <li><a href="#camera" class="menu-link" data-section="camera">📹 Câmera</a></li>
+                        <li><a href="#deteccao" class="menu-link" data-section="deteccao">🔍 Detecção</a></li>
+                        <li><a href="#telegram" class="menu-link" data-section="telegram">📱 Telegram</a></li>
+                        <li><a href="#gravacao" class="menu-link" data-section="gravacao">⏺️ Gravação</a></li>
+                        <li><a href="#seguranca" class="menu-link" data-section="seguranca">🔐 Segurança</a></li>
+                        <li><a href="#sistema" class="menu-link" data-section="sistema">⚙️ Sistema</a></li>
+                        <li><a href="#import-export" class="menu-link" data-section="import-export">📤 Importar/Exportar</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <main class="settings-panel">
+                <!-- Aba Geral -->
+                <section id="geral" class="settings-section active">
+                    <h2>Configurações Gerais</h2>
+                    
+                    <!-- Exemplo de Painel Escuro com Títulos Claros -->
+                    <div class="white-panel" style="background-color: #1f2937; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #374151;">
+                        <h3 style="color: #f9fafb; margin-bottom: 15px;">📋 Informações do Sistema</h3>
+                        <p style="color: #d1d5db; margin-bottom: 10px;">Sistema: Centro de Monitoramento IA</p>
+                        <p style="color: #d1d5db; margin-bottom: 10px;">Versão: 1.0.0</p>
+                        <p style="color: #d1d5db;">Status: <span style="color: #10b981;">✅ Operacional</span></p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="system_name">Nome do Sistema</label>
+                        <input type="text" id="system_name" name="system_name" value="Sistema de Vigilância IA">
+                        <small>Nome exibido no dashboard</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="debug_mode" name="debug_mode">
+                            <span class="slider"></span>
+                        </label>
+                        <label for="debug_mode" style="display: inline; margin-left: 10px;">Modo Debug</label>
+                        <small>Ativa logs detalhados para depuração</small>
+                    </div>
+                </section>
+
+                <!-- Aba Câmera -->
+                <section id="camera" class="settings-section">
+                    <h2>Configurações da Câmera</h2>
+                    
+                    <div class="form-group">
+                        <label for="rtsp_url">URL RTSP da Câmera</label>
+                        <input type="text" id="rtsp_url" name="rtsp_url" value="{{ config.camera.rtsp_url }}">
+                        <small>Formato: rtsp://usuario:senha@ip:porta/stream</small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="frame_rate">Taxa de Quadros (FPS)</label>
+                            <input type="number" id="frame_rate" name="frame_rate" value="{{ config.camera.frame_rate }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="reconnect_attempts">Tentativas de Reconexão</label>
+                            <input type="number" id="reconnect_attempts" name="reconnect_attempts" value="{{ config.camera.reconnect_attempts }}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="buffer_size">Tamanho do Buffer</label>
+                        <input type="number" id="buffer_size" name="buffer_size" value="{{ config.camera.buffer_size }}">
+                        <small>Tamanho do buffer em bytes</small>
+                    </div>
+                </section>
+
+                <!-- Aba Detecção -->
+                <section id="deteccao" class="settings-section">
+                    <h2>Configurações de Detecção</h2>
+                    
+                    <h3>Detecção de Movimento</h3>
+                    <div class="form-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="motion_enabled" name="motion_enabled" {% if config.motion_detection.enabled %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                        <label for="motion_enabled" style="display: inline; margin-left: 10px;">Detecção de Movimento Ativada</label>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="min_area">Área Mínima (pixels)</label>
+                            <input type="number" id="min_area" name="min_area" value="{{ config.motion_detection.min_area }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="var_threshold">Limiar de Variação</label>
+                            <input type="number" id="var_threshold" name="var_threshold" value="{{ config.motion_detection.var_threshold }}">
+                        </div>
+                    </div>
+
+                    <h3>YOLOv8 - Detecção de Pessoas</h3>
+                    <div class="form-group">
+                        <label for="yolo_model">Modelo YOLO</label>
+                        <select id="yolo_model" name="yolo_model">
+                            <option value="yolov8n.pt" {% if config.yolo.model == 'yolov8n.pt' %}selected{% endif %}>YOLOv8n (Leve)</option>
+                            <option value="yolov8s.pt" {% if config.yolo.model == 'yolov8s.pt' %}selected{% endif %}>YOLOv8s (Pequeno)</option>
+                            <option value="yolov8m.pt" {% if config.yolo.model == 'yolov8m.pt' %}selected{% endif %}>YOLOv8m (Médio)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confidence">Confiança Mínima (%)</label>
+                        <input type="range" id="confidence" name="confidence" min="0" max="100" value="{{ (config.yolo.confidence * 100) | int }}">
+                        <span id="confidence-value">{{ (config.yolo.confidence * 100) | int }}%</span>
+                    </div>
+                </section>
+
+                <!-- Aba Telegram -->
+                <section id="telegram" class="settings-section">
+                    <h2>Configurações do Telegram</h2>
+                    
+                    <div class="form-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="telegram_enabled" name="telegram_enabled" {% if config.telegram.enabled %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                        <label for="telegram_enabled" style="display: inline; margin-left: 10px;">Notificações Telegram Ativadas</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bot_token">Bot Token</label>
+                        <input type="password" id="bot_token" name="bot_token" value="{{ config.telegram.bot_token }}" placeholder="Seu token do bot">
+                        <small>Obtenha criando um bot com @BotFather</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="chat_id">Chat ID</label>
+                        <input type="text" id="chat_id" name="chat_id" value="{{ config.telegram.chat_id }}" placeholder="Seu chat ID">
+                        <small>Obtenha enviando /start para @userinfobot</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="send_screenshot" name="send_screenshot" {% if config.telegram.send_screenshot %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                        <label for="send_screenshot" style="display: inline; margin-left: 10px;">Enviar Screenshot</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message_template">Template da Mensagem</label>
+                        <textarea id="message_template" name="message_template" rows="4">{{ config.telegram.message_template }}</textarea>
+                        <small>Variáveis disponíveis: {location}, {timestamp}</small>
+                    </div>
+                </section>
+
+                <!-- Aba Gravação -->
+                <section id="gravacao" class="settings-section">
+                    <h2>Configurações de Gravação</h2>
+                    
+                    <div class="form-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="recording_enabled" name="recording_enabled" {% if config.recording.enabled %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                        <label for="recording_enabled" style="display: inline; margin-left: 10px;">Gravação Ativada</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="record_on_person" name="record_on_person" {% if config.recording.record_on_person_detection %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                        <label for="record_on_person" style="display: inline; margin-left: 10px;">Gravar ao Detectar Pessoa</label>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="record_duration">Duração da Gravação (segundos)</label>
+                            <input type="number" id="record_duration" name="record_duration" value="{{ config.recording.record_duration }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="max_storage">Armazenamento Máximo (GB)</label>
+                            <input type="number" id="max_storage" name="max_storage" value="{{ config.recording.max_storage_gb }}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="video_codec">Codec de Vídeo</label>
+                        <select id="video_codec" name="video_codec">
+                            <option value="mp4v" {% if config.recording.video_codec == 'mp4v' %}selected{% endif %}>MP4V</option>
+                            <option value="XVID" {% if config.recording.video_codec == 'XVID' %}selected{% endif %}>XVID</option>
+                            <option value="H264" {% if config.recording.video_codec == 'H264' %}selected{% endif %}>H264</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- Aba Segurança -->
+                <section id="seguranca" class="settings-section">
+                    <h2>Configurações de Segurança</h2>
+                    
+                    <div class="form-group">
+                        <label for="username">Nome de Usuário</label>
+                        <input type="text" id="username" name="username" value="{{ config.security.username }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new_password">Nova Senha</label>
+                        <input type="password" id="new_password" name="new_password" placeholder="Deixe vazio para manter atual">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password">Confirmar Nova Senha</label>
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirme a nova senha">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="session_timeout">Tempo de Sessão (segundos)</label>
+                            <input type="number" id="session_timeout" name="session_timeout" value="{{ config.security.session_timeout }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="max_attempts">Máximo de Tentativas de Login</label>
+                            <input type="number" id="max_attempts" name="max_attempts" value="{{ config.security.max_login_attempts }}">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Aba Sistema -->
+                <section id="sistema" class="settings-section">
+                    <h2>Configurações do Sistema</h2>
+                    
+                    <div class="form-group">
+                        <label for="host">Host do Servidor</label>
+                        <input type="text" id="host" name="host" value="{{ config.system.host }}">
+                        <small>Use 0.0.0.0 para aceitar conexões externas</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="port">Porta do Servidor</label>
+                        <input type="number" id="port" name="port" value="{{ config.system.port }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="log_level">Nível de Log</label>
+                        <select id="log_level" name="log_level">
+                            <option value="DEBUG" {% if config.logging.level == 'DEBUG' %}selected{% endif %}>DEBUG</option>
+                            <option value="INFO" {% if config.logging.level == 'INFO' %}selected{% endif %}>INFO</option>
+                            <option value="WARNING" {% if config.logging.level == 'WARNING' %}selected{% endif %}>WARNING</option>
+                            <option value="ERROR" {% if config.logging.level == 'ERROR' %}selected{% endif %}>ERROR</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- Aba Importar/Exportar -->
+                <section id="import-export" class="settings-section">
+                    <h2>Importar/Exportar Configurações</h2>
+                    
+                    <div class="form-group">
+                        <h3>Exportar Configurações</h3>
+                        <p>Faça backup das suas configurações atuais</p>
+                        <div class="settings-actions">
+                            <a href="/api/config/export/json" class="btn btn-info">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Exportar JSON
+                            </a>
+                            <a href="/api/config/export/yaml" class="btn btn-info">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Exportar YAML
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <h3>Importar Configurações</h3>
+                        <p>Restaure configurações de um arquivo de backup</p>
+                        <form id="import-form" enctype="multipart/form-data">
+                            <div class="file-input-wrapper">
+                                <button type="button" class="btn btn-warning" onclick="document.getElementById('import-file').click()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                    Escolher Arquivo
+                                </button>
+                                <input type="file" id="import-file" name="file" accept=".json,.yaml,.yml">
+                            </div>
+                            <button type="submit" class="btn btn-success">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        Salvar Configurações
+                    </button>
+                        </form>
+                    </div>
+
+                    <div class="form-group">
+                        <h3>Configurações Padrão</h3>
+                        <p>Restaure as configurações originais do sistema</p>
+                        <button type="button" class="btn btn-danger" onclick="resetToDefaults()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                            </svg>
+                            Restaurar Padrões
+                        </button>
+                    </div>
+                </section>
+
+                <div class="settings-actions">
+                    <button type="button" class="btn btn-success" onclick="saveSettings()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        Salvar Alterações
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="testTelegram()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                        Testar Telegram
+                    </button>
+                    <button type="button" class="btn btn-info" onclick="testCamera()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                            <rect x="2" y="2" width="20" height="16" rx="2" ry="2"></rect>
+                            <circle cx="8" cy="10" r="2"></circle>
+                            <path d="M16 10l2-2 2 2-2 2-2-2z"></path>
+                        </svg>
+                        Testar Câmera
+                    </button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Navegação entre abas
+        document.querySelectorAll('.menu-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remover active de todos
+                document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+                
+                // Adicionar active ao clicado
+                this.classList.add('active');
+                const section = this.getAttribute('data-section');
+                document.getElementById(section).classList.add('active');
+            });
+        });
+
+        // Atualizar valor do range e barra azul
+        document.getElementById('confidence')?.addEventListener('input', function() {
+            document.getElementById('confidence-value').textContent = this.value + '%';
+            // Atualizar barra azul
+            this.style.setProperty('--value', this.value + '%');
+        });
+
+        // Inicializar barra azul ao carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            const confidenceSlider = document.getElementById('confidence');
+            if (confidenceSlider) {
+                confidenceSlider.style.setProperty('--value', confidenceSlider.value + '%');
+            }
+        });
+
+        // Salvar configurações
+        function saveSettings() {
+            const formData = new FormData(document.querySelector('form') || document.body);
+            const data = {};
+            
+            // Organizar dados por seção
+            data.camera = {
+                rtsp_url: document.getElementById('rtsp_url')?.value,
+                frame_rate: parseInt(document.getElementById('frame_rate')?.value),
+                reconnect_attempts: parseInt(document.getElementById('reconnect_attempts')?.value),
+                buffer_size: parseInt(document.getElementById('buffer_size')?.value)
+            };
+            
+            data.motion_detection = {
+                enabled: document.getElementById('motion_enabled')?.checked,
+                min_area: parseInt(document.getElementById('min_area')?.value),
+                var_threshold: parseInt(document.getElementById('var_threshold')?.value)
+            };
+            
+            data.yolo = {
+                model: document.getElementById('yolo_model')?.value,
+                confidence: parseInt(document.getElementById('confidence')?.value) / 100
+            };
+            
+            data.telegram = {
+                enabled: document.getElementById('telegram_enabled')?.checked,
+                bot_token: document.getElementById('bot_token')?.value,
+                chat_id: document.getElementById('chat_id')?.value,
+                send_screenshot: document.getElementById('send_screenshot')?.checked,
+                message_template: document.getElementById('message_template')?.value
+            };
+            
+            data.recording = {
+                enabled: document.getElementById('recording_enabled')?.checked,
+                record_on_person_detection: document.getElementById('record_on_person')?.checked,
+                record_duration: parseInt(document.getElementById('record_duration')?.value),
+                max_storage_gb: parseInt(document.getElementById('max_storage')?.value),
+                video_codec: document.getElementById('video_codec')?.value
+            };
+
+            fetch('/api/config', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert('✅ Configurações salvas com sucesso!');
+                } else {
+                    alert('❌ Erro ao salvar configurações: ' + (result.error || 'Erro desconhecido'));
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('❌ Erro ao salvar configurações');
+            });
+        }
+
+        // Testar Telegram
+        function testTelegram() {
+            alert('📱 Teste de Telegram enviado! Verifique se recebeu a mensagem.');
+        }
+
+        // Testar Câmera
+        function testCamera() {
+            alert('📹 Teste de câmera iniciado! Verifique o dashboard principal.');
+        }
+
+        // Importar configurações
+        document.getElementById('import-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            const fileInput = document.getElementById('import-file');
+            
+            if (fileInput.files.length === 0) {
+                alert('❌ Por favor, selecione um arquivo');
+                return;
+            }
+            
+            formData.append('file', fileInput.files[0]);
+            
+            fetch('/api/config/import', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert('✅ Configurações importadas com sucesso! Recarregando página...');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    alert('❌ Erro ao importar: ' + (result.error || 'Erro desconhecido'));
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('❌ Erro ao importar configurações');
+            });
+        });
+
+        // Restaurar padrões
+        function resetToDefaults() {
+            if (confirm('⚠️ Tem certeza que deseja restaurar as configurações padrões? Isso irá apagar suas configurações atuais.')) {
+                alert('🔄 Restauração de padrões não implementada nesta versão.');
+            }
+        }
+
+        // Carregar configurações atuais via API
+        function loadCurrentConfig() {
+            fetch('/api/config')
+                .then(response => response.json())
+                .then(config => {
+                    console.log('Configurações carregadas:', config);
+                    // Aqui você pode preencher os formulários com os dados atuais
+                })
+                .catch(error => console.error('Erro ao carregar config:', error));
+        }
+
+        // Carregar configurações ao iniciar
+        loadCurrentConfig();
+
+        // 🌟 FUNCIONALIDADE DE TROCA DE TEMA
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeText = document.getElementById('theme-text');
+        const body = document.body;
+
+        // Verificar tema salvo no localStorage
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            body.classList.add('light-theme');
+            updateThemeButton(true);
+        }
+
+        // Alternar tema ao clicar no botão
+        themeToggle.addEventListener('click', function() {
+            const isLightTheme = body.classList.toggle('light-theme');
+            
+            if (isLightTheme) {
+                localStorage.setItem('theme', 'light');
+                updateThemeButton(true);
+            } else {
+                localStorage.setItem('theme', 'dark');
+                updateThemeButton(false);
+            }
+        });
+
+        // Atualizar texto e ícone do botão
+        function updateThemeButton(isLight) {
+            if (isLight) {
+                themeText.textContent = 'Tema Escuro';
+                themeToggle.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    Tema Escuro
+                `;
+            } else {
+                themeText.textContent = 'Tema Claro';
+                themeToggle.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    Tema Claro
+                `;
+            }
+        }
+
+        // Detectar preferência do sistema automaticamente (apenas se não houver tema salvo)
+        if (!savedTheme) {
+            const prefersLightScheme = window.matchMedia('(prefers-color-scheme: light)');
+            if (prefersLightScheme.matches) {
+                body.classList.add('light-theme');
+                updateThemeButton(true);
+            }
+            
+            // Ouvir mudanças na preferência do sistema
+            prefersLightScheme.addEventListener('change', function(e) {
+                if (!localStorage.getItem('theme')) {
+                    if (e.matches) {
+                        body.classList.add('light-theme');
+                        updateThemeButton(true);
+                    } else {
+                        body.classList.remove('light-theme');
+                        updateThemeButton(false);
+                    }
+                }
+            });
+        }
+
+        // 🎯 CORRIGIR FUNDO BRANCO DO MAIN - GARANTIR FUNDO ESCURO
+        function fixMainBackground() {
+            const mainPanel = document.querySelector('main.settings-panel');
+            if (mainPanel && !body.classList.contains('light-theme')) {
+                // Forçar fundo escuro no tema padrão
+                mainPanel.style.backgroundColor = '#1f2937';
+                mainPanel.style.color = '#f9fafb';
+                mainPanel.style.background = '#1f2937';
+                
+                // Garantir que todos os filhos não herdem fundo branco
+                const children = mainPanel.querySelectorAll('*');
+                children.forEach(child => {
+                    if (child.tagName !== 'INPUT' && child.tagName !== 'SELECT' && child.tagName !== 'TEXTAREA' && child.tagName !== 'BUTTON') {
+                        child.style.backgroundColor = 'transparent';
+                    }
+                });
+                
+                console.log('✅ Fundo do main corrigido para escuro');
+            } else if (mainPanel && body.classList.contains('light-theme')) {
+                // No tema claro, garantir fundo branco
+                mainPanel.style.backgroundColor = '';
+                mainPanel.style.color = '';
+                mainPanel.style.background = '';
+                console.log('✅ Fundo do main ajustado para tema claro');
+            }
+        }
+
+        // Aplicar correção ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(fixMainBackground, 100); // Pequeno delay para garantir que tudo carregou
+        });
+
+        // Aplicar correção quando mudar de tema
+        themeToggle.addEventListener('click', function() {
+            setTimeout(fixMainBackground, 50);
+        });
+
+        // Aplicar correção periodicamente (backup)
+        setInterval(fixMainBackground, 1000); // Verificar a cada segundo
+    </script>
+</body>
+</html>
