@@ -226,6 +226,11 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+@app.route('/recordings')
+@login_required
+def recordings():
+    return render_template('recordings.html')
+
 @app.route('/')
 @login_required
 def index():
