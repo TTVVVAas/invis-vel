@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gravações - Centro de Monitoramento IA</title>
+    <title>GravaÃ§Ãµes - Centro de Monitoramento IA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         .recordings-container {
@@ -211,26 +212,53 @@
                     <circle cx="8" cy="10" r="2"></circle>
                     <path d="M16 10l2-2 2 2-2 2-2-2z"></path>
                 </svg>
-                Gravações
+                GravaÃ§Ãµes
             </h1>
             <a href="{{ url_for('index') }}" class="back-btn">
-                ← Voltar ao Monitoramento
+                â† Voltar ao Monitoramento
             </a>
         </header>
 
         <div id="breadcrumb" class="breadcrumb"></div>
-        <div id="content" class="loading">Carregando gravações...</div>
+        <div id="content" class="loading">Carregando gravaÃ§Ãµes...</div>
     </div>
 
     <script>
         let currentPath = [];
+
+        const isEmptyData = (value) => {
+            if (Array.isArray(value)) {
+                return value.length === 0;
+            }
+            if (value && typeof value === 'object') {
+                return Object.keys(value).length === 0;
+            }
+            return !value;
+        };
+
+        const formatBytes = (bytes) => {
+            if (typeof bytes !== 'number' || Number.isNaN(bytes)) {
+                return 'â€”';
+            }
+            if (bytes === 0) {
+                return '0 B';
+            }
+            const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+            let size = bytes;
+            let unitIndex = 0;
+            while (size >= 1024 && unitIndex < units.length - 1) {
+                size /= 1024;
+                unitIndex++;
+            }
+            return `${size.toFixed(1)} ${units[unitIndex]}`;
+        };
         
         function updateBreadcrumb() {
             const breadcrumb = document.getElementById('breadcrumb');
-            let html = '<a href="#" onclick="loadRecordings(); return false;">🏠 Gravações</a>';
+            let html = '<a href="#" onclick="loadRecordings(); return false;">ðŸ  GravaÃ§Ãµes</a>';
             
             currentPath.forEach((part, index) => {
-                html += '<span class="separator">→</span>';
+                html += '<span class="separator">â†’</span>';
                 if (index === currentPath.length - 1) {
                     html += `<strong>${part}</strong>`;
                 } else {
@@ -252,7 +280,7 @@
             const months = {
                 '01_Janeiro': 'Janeiro',
                 '02_Fevereiro': 'Fevereiro',
-                '03_Março': 'Março',
+                '03_MarÃ§o': 'MarÃ§o',
                 '04_Abril': 'Abril',
                 '05_Maio': 'Maio',
                 '06_Junho': 'Junho',
@@ -285,15 +313,15 @@
                     displayContent(data, path);
                 })
                 .catch(error => {
-                    console.error('Erro ao carregar gravações:', error);
-                    document.getElementById('content').innerHTML = '<div class="empty-state">Erro ao carregar gravações</div>';
+                    console.error('Erro ao carregar gravaÃ§Ãµes:', error);
+                    document.getElementById('content').innerHTML = '<div class="empty-state">Erro ao carregar gravaÃ§Ãµes</div>';
                 });
         }
         
         function displayContent(data, path) {
             const content = document.getElementById('content');
             
-            if (data.length === 0) {
+            if (isEmptyData(data)) {
                 content.innerHTML = `
                     <div class="empty-state">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -301,8 +329,8 @@
                             <circle cx="8" cy="10" r="2"></circle>
                             <path d="M16 10l2-2 2 2-2 2-2-2z"></path>
                         </svg>
-                        <h3>Nenhuma gravação encontrada</h3>
-                        <p>As gravações aparecerão aqui quando forem criadas</p>
+                        <h3>Nenhuma gravaÃ§Ã£o encontrada</h3>
+                        <p>As gravaÃ§Ãµes aparecerÃ£o aqui quando forem criadas</p>
                     </div>
                 `;
                 return;
@@ -318,7 +346,7 @@
                 // Mostrar dias
                 displayDays(data);
             } else if (path.length === 3) {
-                // Mostrar vídeos
+                // Mostrar vÃ­deos
                 displayVideos(data);
             }
         }
@@ -341,10 +369,10 @@
                     html += `
                         <div class="year-item" onclick="navigateToPath('${year}')">
                             <div class="item-info">
-                                <h3>📅 ${year}</h3>
+                                <h3>ðŸ“… ${year}</h3>
                                 <p>Clique para ver os meses</p>
                             </div>
-                            <div class="item-count">${totalVideos} vídeo${totalVideos > 1 ? 's' : ''}</div>
+                            <div class="item-count">${totalVideos} vÃ­deo${totalVideos > 1 ? 's' : ''}</div>
                         </div>
                     `;
                 }
@@ -362,10 +390,10 @@
                 html += `
                     <div class="month-item" onclick="navigateToPath('${month.year}/${month.month}')">
                         <div class="item-info">
-                            <h3>📆 ${formatMonthName(month.month)}</h3>
+                            <h3>ðŸ“† ${formatMonthName(month.month)}</h3>
                             <p>Clique para ver os dias</p>
                         </div>
-                        <div class="item-count">${month.video_count} vídeo${month.video_count > 1 ? 's' : ''}</div>
+                        <div class="item-count">${month.video_count} vÃ­deo${month.video_count > 1 ? 's' : ''}</div>
                     </div>
                 `;
             });
@@ -382,10 +410,10 @@
                 html += `
                     <div class="day-item" onclick="navigateToPath('${day.year}/${day.month}/${day.day}')">
                         <div class="item-info">
-                            <h3>📋 Dia ${day.day}</h3>
-                            <p>Clique para ver os vídeos</p>
+                            <h3>ðŸ“‹ Dia ${day.day}</h3>
+                            <p>Clique para ver os vÃ­deos</p>
                         </div>
-                        <div class="item-count">${day.video_count} vídeo${day.video_count > 1 ? 's' : ''}</div>
+                        <div class="item-count">${day.video_count} vÃ­deo${day.video_count > 1 ? 's' : ''}</div>
                     </div>
                 `;
             });
@@ -397,7 +425,7 @@
         function displayVideos(data) {
             const content = document.getElementById('content');
             
-            if (data.length === 0) {
+            if (!data || data.length === 0) {
                 content.innerHTML = `
                     <div class="empty-state">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -405,8 +433,8 @@
                             <circle cx="8" cy="10" r="2"></circle>
                             <path d="M16 10l2-2 2 2-2 2-2-2z"></path>
                         </svg>
-                        <h3>Nenhum vídeo neste dia</h3>
-                        <p>Não foram encontradas gravações para este dia</p>
+                        <h3>Nenhum vÃ­deo neste dia</h3>
+                        <p>NÃ£o foram encontradas gravaÃ§Ãµes para este dia</p>
                     </div>
                 `;
                 return;
@@ -416,16 +444,20 @@
             
             data.forEach(video => {
                 const videoPath = `${currentPath.join('/')}/${video.filename}`;
+                const createdParts = (video.created || '').split(' ');
+                const createdDate = createdParts[0] || '--';
+                const createdTime = createdParts[1] || '--';
+                const sizeText = video.size_formatted || formatBytes(video.size);
                 
                 html += `
                     <div class="recording-item">
                         <div class="recording-header">
                             <div class="recording-title">${video.filename}</div>
-                            <div class="recording-size">${video.size}</div>
+                            <div class="recording-size">${sizeText}</div>
                         </div>
                         <div class="recording-info">
-                            <div class="recording-date">📅 ${video.date}</div>
-                            <div class="recording-time">🕐 ${video.time}</div>
+                            <div class="recording-date">dY". ${createdDate}</div>
+                            <div class="recording-time">dY? ${createdTime}</div>
                         </div>
                         <div class="recording-actions">
                             <a href="/api/recordings/download/${videoPath}" class="btn-download" download>
@@ -452,12 +484,14 @@
         }
         
         function playVideo(path) {
-            // Implementar reprodução de vídeo
-            alert('Função de reprodução será implementada em breve!\nVídeo: ' + path);
+            // Implementar reproduÃ§Ã£o de vÃ­deo
+            alert('FunÃ§Ã£o de reproduÃ§Ã£o serÃ¡ implementada em breve!\nVÃ­deo: ' + path);
         }
         
-        // Carregar gravações ao iniciar
+        // Carregar gravaÃ§Ãµes ao iniciar
         loadRecordings();
     </script>
 </body>
 </html>
+
+

@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alertas de Segurança - Centro de Monitoramento IA</title>
+    <title>Alertas de SeguranÃ§a - Centro de Monitoramento IA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -37,8 +38,8 @@
 
         <main class="alerts-main">
             <div class="alerts-header">
-                <h2>📸 Imagens de Alerta</h2>
-                <p class="alerts-subtitle">Visualize os alertas de detecção de pessoas capturados pelo sistema</p>
+                <h2>ðŸ“¸ Imagens de Alerta</h2>
+                <p class="alerts-subtitle">Visualize os alertas de detecÃ§Ã£o de pessoas capturados pelo sistema</p>
             </div>
 
             {% if alerts %}
@@ -52,19 +53,19 @@
                             </div>
                             <div class="alert-info">
                                 <div class="alert-date">
-                                    <span class="date-icon">📅</span>
+                                    <span class="date-icon">ðŸ“…</span>
                                     {{ alert.date }}
                                 </div>
                                 <div class="alert-time">
-                                    <span class="time-icon">🕐</span>
+                                    <span class="time-icon">ðŸ•</span>
                                     {{ alert.time }}
                                 </div>
                                 <div class="alert-size">
-                                    <span class="size-icon">💾</span>
+                                    <span class="size-icon">ðŸ’¾</span>
                                     {{ alert.size }}
                                 </div>
                                 <div class="alert-type text-success">
-                                    <span class="type-icon">👤</span>
+                                    <span class="type-icon">ðŸ‘¤</span>
                                     Pessoa Detectada
                                 </div>
                             </div>
@@ -73,10 +74,10 @@
                 </div>
             {% else %}
                 <div class="no-alerts">
-                    <div class="no-alerts-icon">📷</div>
+                    <div class="no-alerts-icon">ðŸ“·</div>
                     <h3>Nenhum Alerta Encontrado</h3>
-                    <p>Os alertas aparecerão aqui quando o sistema detectar pessoas</p>
-                    <p class="no-alerts-tip">💡 Dica: Certifique-se de que a IA está ativada no dashboard principal</p>
+                    <p>Os alertas aparecerÃ£o aqui quando o sistema detectar pessoas</p>
+                    <p class="no-alerts-tip">ðŸ’¡ Dica: Certifique-se de que a IA estÃ¡ ativada no dashboard principal</p>
                 </div>
             {% endif %}
         </main>
@@ -87,7 +88,7 @@
     </div>
 
     <style>
-        /* Estilos específicos para a página de alertas */
+        /* Estilos especÃ­ficos para a pÃ¡gina de alertas */
         .alerts-main {
             padding: 2rem;
             max-width: 1200px;
@@ -258,3 +259,4 @@
     </style>
 </body>
 </html>
+

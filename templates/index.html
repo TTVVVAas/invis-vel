@@ -1,314 +1,384 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Centro de Monitoramento IA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 10px;">
-                <rect x="2" y="2" width="20" height="16" rx="2" ry="2"></rect>
-                <circle cx="8" cy="10" r="2"></circle>
-                <path d="M16 10l2-2 2 2-2 2-2-2z"></path>
-            </svg>
-            Centro de Monitoramento IA
-        </h1>
-            <div class="header-info">
-                <span id="current-time"></span>
-                <a href="{{ url_for('logout') }}" class="btn-logout">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    Sair
-                </a>
-                <a href="{{ url_for('alerts') }}" class="nav-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
-                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                        <line x1="12" y1="9" x2="12" y2="13"></line>
-                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                    Alertas
-                </a>
-                <a href="{{ url_for('settings') }}" class="nav-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
-                        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                    Configurações
-                </a>
+    <div class="container py-4">
+        <header class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <h1 class="h3 mb-0 d-flex align-items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2">
+                    <rect x="2" y="2" width="20" height="16" rx="2" ry="2"></rect>
+                    <circle cx="8" cy="10" r="2"></circle>
+                    <path d="M16 10l2-2 2 2-2 2-2-2z"></path>
+                </svg>
+                Centro de Monitoramento IA
+            </h1>
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <span id="current-time" class="text-muted small"></span>
+                <a href="{{ url_for('view_alerts') }}" class="btn btn-outline-primary btn-sm">Alertas</a>
+                <a href="{{ url_for('settings') }}" class="btn btn-outline-secondary btn-sm">ConfiguraÃ§Ãµes</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm">Sair</a>
             </div>
         </header>
 
-        <div class="main-content">
-            <div class="video-section">
-                <div class="video-container">
-                    <img id="video-stream" src="{{ url_for('video_feed') }}" alt="Stream da Câmera">
-                    
-                    <div class="video-overlay">
-                        <div class="status-indicator" id="status-indicator">
-                            <span class="status-dot" id="status-dot"></span>
-                            <span id="status-text">Monitorando...</span>
+        <section class="mt-4">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    {% if cameras %}
+                    <div class="row g-4">
+                        {% for cam in cameras %}
+                        <div class="col-12 col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span>{{ cam.name or cam.id }}</span>
+                                    <span class="badge badge-offline" id="badge-{{ cam.id }}">Aguardando</span>
+                                </div>
+                                <div class="card-body">
+                                    <img src="{{ url_for('default_video_feed') }}?camera_id={{ cam.id }}"
+                                         class="cam-stream img-fluid"
+                                         alt="{{ cam.name or cam.id }}">
+                                    <div class="small text-muted mt-2" id="meta-{{ cam.id }}">
+                                        Eventos: 0 movimento / 0 pessoa
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        Nenhuma cÃ¢mera cadastrada. Adicione entradas em <code>config.py</code> para comeÃ§ar.
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card mb-3">
+                        <div class="card-header">Status Geral</div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="status-dot" id="status-dot"></span>
+                                <span class="ms-2" id="status-text">Monitorando...</span>
+                            </div>
+                            <ul class="list-unstyled small mb-0">
+                                <li><strong>ConexÃµes:</strong> <span id="camera-connected">--</span></li>
+                                <li><strong>Movimento:</strong> <span id="motion-status">Inativo</span></li>
+                                <li><strong>Pessoa:</strong> <span id="person-status">NÃ£o detectado</span></li>
+                                <li><strong>Ãšltima atualizaÃ§Ã£o:</strong> <span id="last-detection">--:--:--</span></li>
+                                <li><strong>IA:</strong> <span id="ai-last">--</span></li>
+                                <li><strong>DetecÃ§Ãµes:</strong> <span id="total-detections">0</span></li>
+                                <li><strong>FPS mÃ©dio:</strong> <span id="avg-fps">--</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header">EstatÃ­sticas</div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div class="text-center flex-fill">
+                                    <div class="stat-number" id="motion-count">0</div>
+                                    <small class="text-muted">Movimentos</small>
+                                </div>
+                                <div class="text-center flex-fill">
+                                    <div class="stat-number" id="person-count">0</div>
+                                    <small class="text-muted">Pessoas</small>
+                                </div>
+                                <div class="text-center flex-fill">
+                                    <div class="stat-number" id="alert-count">0</div>
+                                    <small class="text-muted">Alertas</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">AÃ§Ãµes RÃ¡pidas</div>
+                        <div class="card-body d-grid gap-2">
+                            <button id="btn-config" class="btn btn-outline-light btn-sm">Configurar cÃ¢meras</button>
+                            <button id="view-alerts-btn" class="btn btn-primary btn-sm">Ver alertas salvos</button>
+                            <button id="btn-alerts" class="btn btn-outline-warning btn-sm">Configurar alertas</button>
+                            <button id="btn-record" class="btn btn-outline-danger btn-sm">Gravar</button>
+                            <button id="btn-recordings" class="btn btn-outline-info btn-sm">GravaÃ§Ãµes</button>
+                            <button id="btn-settings" class="btn btn-outline-secondary btn-sm">ConfiguraÃ§Ãµes avanÃ§adas</button>
                         </div>
                     </div>
                 </div>
             </div>
+        </section>
+    </div>
 
-            <div class="sidebar">
-                <div class="panel">
-                    <h3>📊 Status do Sistema</h3>
-                    <div class="status-item">
-                        <span>Conexão:</span>
-                        <span class="status-indicator" id="camera-status">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                            </svg>
-                        </span>
-                        <span class="status-ok">Online</span>
-                    </div>
-                    <div class="status-item">
-                        <span>IA YOLOv8:</span>
-                        <span class="status-ok">✅ Ativa</span>
-                    </div>
-                    <div class="status-item">
-                        <span>Detecção de Movimento:</span>
-                        <span id="motion-status">⏸️ Inativa</span>
-                    </div>
-                    <div class="status-item">
-                        <span>Pessoa Detectada:</span>
-                        <span id="person-status">❌ Não</span>
-                    </div>
-                    <div class="status-item">
-                        <span>Última Detecção:</span>
-                        <span id="last-detection">--:--:--</span>
-                    </div>
+    <div id="config-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Configurar CÃ¢meras RTSP</h2>
+            <form id="config-form">
+                <div class="mb-3">
+                    <label for="camera-select" class="form-label">CÃ¢mera</label>
+                    <select id="camera-select" name="camera_id" class="form-select">
+                        {% for cam in cameras %}
+                        <option value="{{ cam.id }}">{{ cam.name or cam.id }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-
-                <div class="panel">
-                    <h3>⚙️ Controles</h3>
-                    <button id="btn-config" class="btn-control">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
-                            <rect x="2" y="2" width="20" height="16" rx="2" ry="2"></rect>
-                            <circle cx="8" cy="10" r="2"></circle>
-                            <path d="M16 10l2-2 2 2-2 2-2-2z"></path>
-                        </svg>
-                        Configurar Câmera
-                    </button>
-                    <div class="alert-controls">
-                        <button id="view-alerts-btn" class="btn btn-primary">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                <polyline points="21 15 16 10 5 21"></polyline>
-                            </svg>
-                            Ver Alertas Salvos
-                        </button>
-                        <button id="btn-alerts" class="btn-control">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
-                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                                <line x1="12" y1="9" x2="12" y2="13"></line>
-                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                            </svg>
-                            Configurar Alertas
-                        </button>
-                    </div>
-                    <button id="btn-record" class="btn-control">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <circle cx="12" cy="12" r="4"></circle>
-                          </svg>
-                          Gravar
-                      </button>
-                    <button id="btn-settings" class="btn-control">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
-                              <circle cx="12" cy="12" r="3"></circle>
-                              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V12a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                          </svg>
-                          Configurações
-                      </button>
-                      <button id="btn-recordings" class="btn-control" onclick="openRecordings()">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
-                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                              <polyline points="21 15 16 10 5 21"></polyline>
-                          </svg>
-                          Gravações
-                      </button>
+                <div class="mb-3">
+                    <label for="rtsp-url" class="form-label">URL RTSP</label>
+                    <input type="text" id="rtsp-url" name="rtsp_url" class="form-control"
+                           placeholder="rtsp://usuario:senha@ip:554/stream">
                 </div>
-
-                <div class="panel">
-                    <h3>📈 Estatísticas</h3>
-                    <div class="stats">
-                        <div class="stat-item">
-                            <span class="stat-number" id="motion-count">0</span>
-                            <span class="stat-label">Movimentos</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number" id="person-count">0</span>
-                            <span class="stat-label">Pessoas</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number" id="alert-count">0</span>
-                            <span class="stat-label">Alertas</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal de Configuração -->
-        <div id="config-modal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>📹 Configurar Câmera RTSP</h2>
-                <form id="config-form">
-                    <div class="form-group">
-                        <label for="rtsp-url">URL RTSP:</label>
-                        <input type="text" id="rtsp-url" name="rtsp_url" 
-                               placeholder="rtsp://usuario:senha@ip:554/stream">
-                        <small>Formato: rtsp://usuario:senha@endereco_ip:porta/caminho</small>
-                    </div>
-                    <button type="submit" class="btn-save">💾 Salvar Configurações</button>
-                </form>
-            </div>
+                <button type="submit" class="btn btn-primary w-100">Salvar ConfiguraÃ§Ãµes</button>
+            </form>
         </div>
     </div>
 
     <script>
-        // Atualizar relógio
+        let cameraConfigCache = [];
+
         function updateClock() {
             const now = new Date();
-            document.getElementById('current-time').textContent = now.toLocaleString('pt-BR');
+            const clock = document.getElementById('current-time');
+            if (clock) {
+                clock.textContent = now.toLocaleString('pt-BR');
+            }
         }
         updateClock();
         setInterval(updateClock, 1000);
 
-        // Contadores
-        let motionCount = 0;
-        let personCount = 0;
-        let alertCount = 0;
+        function updateCameraBadges(cameras = []) {
+            cameras.forEach(cam => {
+                const badge = document.getElementById(`badge-${cam.id}`);
+                const meta = document.getElementById(`meta-${cam.id}`);
+                if (!badge) return;
 
-        // Atualizar status
+                if (cam.connected) {
+                    badge.classList.remove('badge-offline');
+                    badge.classList.add('badge-online');
+                    if (cam.person_detected) {
+                        badge.textContent = 'Pessoa detectada';
+                    } else if (cam.motion_detected) {
+                        badge.textContent = 'Movimento';
+                    } else {
+                        badge.textContent = 'Online';
+                    }
+                } else {
+                    badge.classList.remove('badge-online');
+                    badge.classList.add('badge-offline');
+                    badge.textContent = 'Offline';
+                }
+
+                if (meta) {
+                    const detections = cam.detection_count ?? cam.person_events ?? 0;
+                    const lastDetection = cam.last_detection || 'nunca';
+                    const lastInference = cam.last_inference || 'nunca';
+                    const fpsText = typeof cam.frame_rate === 'number'
+                        ? `${cam.frame_rate.toFixed(1)} fps`
+                        : (cam.frame_rate || '--');
+                    meta.innerHTML = `
+                        <div>IA: <strong>${cam.ai_active ? 'Ativa' : 'Standby'}</strong> â€¢ Ãšltima IA: ${lastInference}</div>
+                        <div class="text-muted small">DetecÃ§Ãµes: ${detections} â€¢ Ãšltima detecÃ§Ã£o: ${lastDetection} â€¢ FPS: ${fpsText}</div>
+                    `;
+                }
+            });
+        }
+
         function updateStatus() {
             fetch('/status')
                 .then(response => response.json())
                 .then(data => {
+                    updateCameraBadges(data.cameras || []);
+
                     const statusDot = document.getElementById('status-dot');
                     const statusText = document.getElementById('status-text');
                     const motionStatus = document.getElementById('motion-status');
                     const personStatus = document.getElementById('person-status');
                     const lastDetection = document.getElementById('last-detection');
+                    const cameraConnected = document.getElementById('camera-connected');
+                    const aiLast = document.getElementById('ai-last');
+                    const avgFps = document.getElementById('avg-fps');
+                    const totalDetections = document.getElementById('total-detections');
 
                     if (data.person_detected) {
                         statusDot.className = 'status-dot danger';
-                        statusText.textContent = 'PESSOA DETECTADA!';
-                        personStatus.innerHTML = '⚠️ <strong>Sim</strong>';
-                        personCount++;
-                        alertCount++;
-                        document.getElementById('person-count').textContent = personCount;
-                        document.getElementById('alert-count').textContent = alertCount;
+                        statusText.textContent = 'Pessoa detectada';
+                        personStatus.textContent = 'Ativo';
+                        motionStatus.textContent = 'Movimento presente';
                     } else if (data.motion_detected) {
                         statusDot.className = 'status-dot warning';
-                        statusText.textContent = 'MOVIMENTO DETECTADO';
-                        motionStatus.innerHTML = '⚠️ <strong>Ativa</strong>';
-                        motionCount++;
-                        document.getElementById('motion-count').textContent = motionCount;
+                        statusText.textContent = 'Movimento detectado';
+                        motionStatus.textContent = 'Movimento presente';
+                        personStatus.textContent = 'Nenhuma pessoa';
                     } else {
                         statusDot.className = 'status-dot success';
                         statusText.textContent = 'Monitorando...';
-                        motionStatus.innerHTML = '⏸️ Inativa';
-                        personStatus.innerHTML = '❌ Não';
+                        motionStatus.textContent = 'Inativo';
+                        personStatus.textContent = 'NÃ£o detectado';
                     }
 
-                    if (data.timestamp) {
-                        lastDetection.textContent = data.timestamp.split(' ')[1];
+                    if (cameraConnected) {
+                        cameraConnected.textContent = data.camera_connected ? 'Online' : 'Offline';
                     }
-                    
-                    // Atualizar estatísticas de alertas se disponíveis
-                    if (data.alert_stats) {
-                        console.log('Estatísticas de alertas:', data.alert_stats);
+                    if (data.timestamp && lastDetection) {
+                        lastDetection.textContent = data.timestamp;
                     }
+                    if (aiLast) {
+                        aiLast.textContent = data.ai_last_timestamp || '--';
+                    }
+                    if (totalDetections) {
+                        totalDetections.textContent = data.total_detections ?? 0;
+                    }
+                    if (avgFps) {
+                        const fpsValue = typeof data.avg_fps === 'number'
+                            ? `${data.avg_fps.toFixed(1)} fps`
+                            : '--';
+                        avgFps.textContent = fpsValue;
+                    }
+
+                    const motionCount = typeof data.motion_count === 'number' ? data.motion_count : 0;
+                    const personCount = typeof data.person_count === 'number' ? data.person_count : 0;
+                    const alertCount = typeof data.alert_count === 'number' ? data.alert_count : 0;
+                    document.getElementById('motion-count').textContent = motionCount;
+                    document.getElementById('person-count').textContent = personCount;
+                    document.getElementById('alert-count').textContent = alertCount;
                 })
                 .catch(error => console.error('Erro ao obter status:', error));
         }
-
-        // Atualizar status a cada 2 segundos
+        updateStatus();
         setInterval(updateStatus, 2000);
 
-        // Modal de configuração
+        function setupStreamFullscreen() {
+            document.querySelectorAll('.cam-stream').forEach(stream => {
+                if (stream.dataset.fsBound === 'true') {
+                    return;
+                }
+                stream.dataset.fsBound = 'true';
+                stream.addEventListener('dblclick', () => {
+                    const exitFullscreen = () => {
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.webkitExitFullscreen) {
+                            document.webkitExitFullscreen();
+                        }
+                    };
+
+                    const isFullscreen =
+                        document.fullscreenElement === stream ||
+                        document.webkitFullscreenElement === stream;
+
+                    if (isFullscreen) {
+                        exitFullscreen();
+                        return;
+                    }
+
+                    const request = stream.requestFullscreen
+                        || stream.webkitRequestFullscreen
+                        || stream.msRequestFullscreen;
+
+                    if (request) {
+                        request.call(stream);
+                    } else {
+                        console.warn('Fullscreen API nÃ£o suportada neste navegador');
+                    }
+                });
+            });
+        }
+        setupStreamFullscreen();
+
         const modal = document.getElementById('config-modal');
         const btnConfig = document.getElementById('btn-config');
-        const span = document.getElementsByClassName('close')[0];
+        const closeModal = modal ? modal.querySelector('.close') : null;
+        const cameraSelect = document.getElementById('camera-select');
+        const rtspInput = document.getElementById('rtsp-url');
 
-        btnConfig.onclick = function() {
-            modal.style.display = 'block';
-            // Carregar configuração atual
+        function syncRtspField() {
+            if (!cameraSelect || !rtspInput) return;
+            const selected = cameraConfigCache.find(cam => cam.id === cameraSelect.value);
+            rtspInput.value = selected ? (selected.rtsp_url || '') : '';
+        }
+
+        function loadCameraConfig() {
             fetch('/config')
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('rtsp-url').value = data.rtsp_url || '';
+                    cameraConfigCache = data.cameras || [];
+                    if (cameraSelect) {
+                        cameraSelect.innerHTML = '';
+                        cameraConfigCache.forEach(cam => {
+                            const option = document.createElement('option');
+                            option.value = cam.id;
+                            option.textContent = cam.name || cam.id;
+                            cameraSelect.appendChild(option);
+                        });
+                        syncRtspField();
+                    }
                 });
         }
 
-        span.onclick = function() {
-            modal.style.display = 'none';
+        if (cameraSelect) {
+            cameraSelect.addEventListener('change', syncRtspField);
         }
 
-        window.onclick = function(event) {
-            if (event.target == modal) {
+        if (btnConfig && modal) {
+            btnConfig.addEventListener('click', () => {
+                modal.style.display = 'block';
+                loadCameraConfig();
+            });
+        }
+
+        if (closeModal) {
+            closeModal.addEventListener('click', () => modal.style.display = 'none');
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
                 modal.style.display = 'none';
             }
+        });
+
+        const configForm = document.getElementById('config-form');
+        if (configForm) {
+            configForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(configForm);
+
+                fetch('/config', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message || data.error || 'ConfiguraÃ§Ã£o salva');
+                    modal.style.display = 'none';
+                    updateStatus();
+                })
+                .catch(err => {
+                    alert('Erro ao salvar configuraÃ§Ã£o');
+                    console.error(err);
+                });
+            });
         }
 
-        // Formulário de configuração
-        document.getElementById('config-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            
-            fetch('/config', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message || 'Configuração salva com sucesso!');
-                modal.style.display = 'none';
-            })
-            .catch(error => {
-                alert('Erro ao salvar configuração');
-                console.error('Erro:', error);
-            });
-        });
-
-        // Botão ver alertas
-        document.getElementById('view-alerts-btn').addEventListener('click', function() {
+        document.getElementById('view-alerts-btn')?.addEventListener('click', () => {
             window.location.href = '/alerts';
         });
-
-        // Botão configurar alertas (existente)
-        document.getElementById('btn-alerts').addEventListener('click', function() {
+        document.getElementById('btn-alerts')?.addEventListener('click', () => {
             window.open('/alerts', '_blank');
         });
-
-        // Botão de gravação
-        document.getElementById('btn-record').addEventListener('click', function() {
-            alert('Função de gravação será implementada em breve!');
+        document.getElementById('btn-record')?.addEventListener('click', () => {
+            alert('FunÃ§Ã£o de gravaÃ§Ã£o disponÃ­vel em breve.');
         });
-
-        // Botão gravações
-        document.getElementById('btn-recordings').addEventListener('click', function() {
+        document.getElementById('btn-recordings')?.addEventListener('click', () => {
             window.location.href = '/recordings';
         });
-
-        // Botão configurações
-        document.getElementById('btn-settings').addEventListener('click', function() {
+        document.getElementById('btn-settings')?.addEventListener('click', () => {
             window.location.href = '/settings';
         });
     </script>
 </body>
 </html>
+
+

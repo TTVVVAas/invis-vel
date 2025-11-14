@@ -1,12 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Centro de Monitoramento IA - Configurações</title>
+    <title>Centro de Monitoramento IA - ConfiguraÃ§Ãµes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        /* Estilos específicos para a página de configurações */
+        /* Estilos especÃ­ficos para a pÃ¡gina de configuraÃ§Ãµes */
         body {
             background-color: #111827;
             color: #f9fafb;
@@ -61,6 +62,81 @@
             color: #f9fafb;
         }
 
+        .camera-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .camera-card {
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .camera-card h4 {
+            margin: 0 0 0.3rem 0;
+            color: #f9fafb;
+        }
+
+        .camera-meta {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #d1d5db;
+            word-break: break-all;
+        }
+
+        .camera-card .form-group.compact {
+            margin-bottom: 0.75rem;
+        }
+
+        .camera-card .form-group.compact label {
+            font-size: 0.8rem;
+            color: #d1d5db;
+            margin-bottom: 0.2rem;
+        }
+
+        .camera-card-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1050;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: #1f2937;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid #374151;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-card h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
         .settings-menu {
             list-style: none;
             padding: 0;
@@ -93,7 +169,7 @@
             border: 1px solid #374151;
         }
         
-        /* Estilo para painel escuro com títulos claros */
+        /* Estilo para painel escuro com tÃ­tulos claros */
         .white-panel {
             background-color: #1f2937;
             padding: 20px;
@@ -108,10 +184,10 @@
         .white-panel h4,
         .white-panel h5,
         .white-panel h6 {
-            color: #f9fafb !important; /* Branco suave com prioridade máxima */
+            color: #f9fafb !important; /* Branco suave com prioridade mÃ¡xima */
         }
 
-        /* 🌟 SOLUÇÃO: Adaptação automática para temas claros */
+        /* ðŸŒŸ SOLUÃ‡ÃƒO: AdaptaÃ§Ã£o automÃ¡tica para temas claros */
         /* Se o fundo for claro, muda o texto para escuro automaticamente */
         @media (prefers-color-scheme: light) {
             .settings-sidebar,
@@ -177,7 +253,7 @@
             }
         }
 
-        /* 🌟 SOLUÇÃO: Classes para troca manual de tema */
+        /* ðŸŒŸ SOLUÃ‡ÃƒO: Classes para troca manual de tema */
         .light-theme .settings-sidebar,
         .light-theme .settings-panel,
         .light-theme .white-panel,
@@ -188,7 +264,7 @@
             border-color: #e5e7eb !important;
         }
 
-        /* 🌟 Garantir fundo escuro no tema padrão */
+        /* ðŸŒŸ Garantir fundo escuro no tema padrÃ£o */
         main.settings-panel {
             background-color: #1f2937 !important;
             color: #f9fafb !important;
@@ -199,7 +275,7 @@
             color: #f9fafb !important;
         }
         
-        /* 🌟 Regra com prioridade máxima para garantir visibilidade */
+        /* ðŸŒŸ Regra com prioridade mÃ¡xima para garantir visibilidade */
         main.settings-panel[style] {
             background-color: #1f2937 !important;
         }
@@ -210,7 +286,7 @@
             color: #f9fafb !important;
         }
         
-        /* Forçar contra qualquer estilo inline ou JavaScript */
+        /* ForÃ§ar contra qualquer estilo inline ou JavaScript */
         .settings-container > main.settings-panel {
             background-color: #1f2937 !important;
             color: #f9fafb !important;
@@ -222,7 +298,7 @@
             background-color: transparent !important;
         }
         
-        /* Exceção para inputs e elementos interativos */
+        /* ExceÃ§Ã£o para inputs e elementos interativos */
         .settings-panel input,
         .settings-panel select,
         .settings-panel textarea,
@@ -230,7 +306,7 @@
             background-color: #374151 !important;
         }
         
-        /* MÁXIMA ESPECIFICIDADE - Garantir fundo escuro */
+        /* MÃXIMA ESPECIFICIDADE - Garantir fundo escuro */
         html body:not(.light-theme) div.settings-container main.settings-panel.settings-panel.settings-panel {
             background-color: #1f2937 !important;
             background: #1f2937 !important;
@@ -309,7 +385,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             color: #f9fafb !important;
             border: 1px solid #374151;
-            min-height: 600px; /* Garantir altura mínima */
+            min-height: 600px; /* Garantir altura mÃ­nima */
         }
         
         .settings-panel h2 {
@@ -329,7 +405,7 @@
             font-weight: 600;
         }
         
-         /* Garantir que títulos dentro das seções sejam claros */
+         /* Garantir que tÃ­tulos dentro das seÃ§Ãµes sejam claros */
          .settings-section h2 {
              color: #f9fafb !important;
              border-bottom: 2px solid #3b82f6;
@@ -345,7 +421,7 @@
              font-weight: 600;
          }
 
-         /* Título específico: "Configurações Gerais" deve ser claro */
+         /* TÃ­tulo especÃ­fico: "ConfiguraÃ§Ãµes Gerais" deve ser claro */
         #geral h2 {
             color: #f9fafb !important;
             text-shadow: 0 1px 2px rgba(0,0,0,0.25);
@@ -357,9 +433,9 @@
             text-shadow: none;
         }
         
-         /* Removido: regra global que forçava títulos claros dentro do settings-panel */
+         /* Removido: regra global que forÃ§ava tÃ­tulos claros dentro do settings-panel */
          
-         /* Deixar todos os títulos e textos com a mesma cor dos labels */
+         /* Deixar todos os tÃ­tulos e textos com a mesma cor dos labels */
          .settings-section h2,
          .settings-section h3,
          .settings-section p,
@@ -369,7 +445,7 @@
              color: #f9fafb !important;
          }
          
-         /* Garantir que todos os h2 e h3 no settings sejam visíveis */
+         /* Garantir que todos os h2 e h3 no settings sejam visÃ­veis */
          .settings-container h2,
          .settings-container h3,
          #geral h2,
@@ -592,7 +668,7 @@
             Centro de Monitoramento IA
         </h1>
             <div class="settings-nav">
-                <!-- 🌟 Botão de Troca de Tema -->
+                <!-- ðŸŒŸ BotÃ£o de Troca de Tema -->
                 <button type="button" id="theme-toggle" class="btn btn-info" style="margin-right: 1rem;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
                         <circle cx="12" cy="12" r="5"></circle>
@@ -629,14 +705,14 @@
             <aside class="settings-sidebar">
                 <nav>
                     <ul class="settings-menu">
-                        <li><a href="#geral" class="menu-link active" data-section="geral">🏠 Geral</a></li>
-                        <li><a href="#camera" class="menu-link" data-section="camera">📹 Câmera</a></li>
-                        <li><a href="#deteccao" class="menu-link" data-section="deteccao">🔍 Detecção</a></li>
-                        <li><a href="#telegram" class="menu-link" data-section="telegram">📱 Telegram</a></li>
-                        <li><a href="#gravacao" class="menu-link" data-section="gravacao">⏺️ Gravação</a></li>
-                        <li><a href="#seguranca" class="menu-link" data-section="seguranca">🔐 Segurança</a></li>
-                        <li><a href="#sistema" class="menu-link" data-section="sistema">⚙️ Sistema</a></li>
-                        <li><a href="#import-export" class="menu-link" data-section="import-export">📤 Importar/Exportar</a></li>
+                        <li><a href="#geral" class="menu-link active" data-section="geral">ðŸ  Geral</a></li>
+                        <li><a href="#camera" class="menu-link" data-section="camera">ðŸ“¹ CÃ¢mera</a></li>
+                        <li><a href="#deteccao" class="menu-link" data-section="deteccao">ðŸ” DetecÃ§Ã£o</a></li>
+                        <li><a href="#telegram" class="menu-link" data-section="telegram">ðŸ“± Telegram</a></li>
+                        <li><a href="#gravacao" class="menu-link" data-section="gravacao">âºï¸ GravaÃ§Ã£o</a></li>
+                        <li><a href="#seguranca" class="menu-link" data-section="seguranca">ðŸ” SeguranÃ§a</a></li>
+                        <li><a href="#sistema" class="menu-link" data-section="sistema">âš™ï¸ Sistema</a></li>
+                        <li><a href="#import-export" class="menu-link" data-section="import-export">ðŸ“¤ Importar/Exportar</a></li>
                     </ul>
                 </nav>
             </aside>
@@ -644,19 +720,19 @@
             <main class="settings-panel">
                 <!-- Aba Geral -->
                 <section id="geral" class="settings-section active">
-                    <h2>Configurações Gerais</h2>
+                    <h2>ConfiguraÃ§Ãµes Gerais</h2>
                     
-                    <!-- Exemplo de Painel Escuro com Títulos Claros -->
+                    <!-- Exemplo de Painel Escuro com TÃ­tulos Claros -->
                     <div class="white-panel" style="background-color: #1f2937; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #374151;">
-                        <h3 style="color: #f9fafb; margin-bottom: 15px;">📋 Informações do Sistema</h3>
+                        <h3 style="color: #f9fafb; margin-bottom: 15px;">ðŸ“‹ InformaÃ§Ãµes do Sistema</h3>
                         <p style="color: #d1d5db; margin-bottom: 10px;">Sistema: Centro de Monitoramento IA</p>
-                        <p style="color: #d1d5db; margin-bottom: 10px;">Versão: 1.0.0</p>
-                        <p style="color: #d1d5db;">Status: <span style="color: #10b981;">✅ Operacional</span></p>
+                        <p style="color: #d1d5db; margin-bottom: 10px;">VersÃ£o: 1.0.0</p>
+                        <p style="color: #d1d5db;">Status: <span style="color: #10b981;">âœ… Operacional</span></p>
                     </div>
                     
                     <div class="form-group">
                         <label for="system_name">Nome do Sistema</label>
-                        <input type="text" id="system_name" name="system_name" value="Sistema de Vigilância IA">
+                        <input type="text" id="system_name" name="system_name" value="Sistema de VigilÃ¢ncia IA">
                         <small>Nome exibido no dashboard</small>
                     </div>
 
@@ -666,74 +742,114 @@
                             <span class="slider"></span>
                         </label>
                         <label for="debug_mode" style="display: inline; margin-left: 10px;">Modo Debug</label>
-                        <small>Ativa logs detalhados para depuração</small>
+                        <small>Ativa logs detalhados para depuraÃ§Ã£o</small>
                     </div>
                 </section>
 
-                <!-- Aba Câmera -->
+                <!-- Aba CÃ¢mera -->
                 <section id="camera" class="settings-section">
-                    <h2>Configurações da Câmera</h2>
-                    
-                    <div class="form-group">
-                        <label for="rtsp_url">URL RTSP da Câmera</label>
-                        <input type="text" id="rtsp_url" name="rtsp_url" value="{{ config.camera.rtsp_url }}">
-                        <small>Formato: rtsp://usuario:senha@ip:porta/stream</small>
+                    <div class="section-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2>ConfiguraÃ§Ãµes das CÃ¢meras</h2>
+                            <p class="text-muted mb-0">Edite RTSP, nomes e estado ou adicione novas cÃ¢meras.</p>
+                        </div>
+                        <button type="button" class="btn btn-success btn-sm" id="btn-add-camera">Adicionar nova cÃ¢mera</button>
                     </div>
+
+                    <div class="camera-grid">
+                        {% for cam in config.cameras %}
+                        <div class="camera-card" data-camera-id="{{ cam.id }}">
+                            <div class="camera-card-body">
+                                <div class="form-group compact">
+                                    <label>Nome</label>
+                                    <input type="text" class="form-control camera-name" value="{{ cam.name or cam.id }}">
+                                </div>
+                                <div class="form-group compact">
+                                    <label>RTSP</label>
+                                    <input type="text" class="form-control camera-rtsp" value="{{ cam.rtsp_url }}">
+                                </div>
+                                <div class="form-check form-switch compact">
+                                    <input class="form-check-input camera-enabled" type="checkbox" role="switch"
+                                           id="camera-enabled-{{ cam.id }}" {% if cam.enabled %}checked{% endif %}>
+                                    <label class="form-check-label" for="camera-enabled-{{ cam.id }}">Ativa</label>
+                                </div>
+                                <p class="camera-meta">ID: {{ cam.id }}</p>
+                            </div>
+                            <div class="camera-card-actions">
+                                <button type="button"
+                                        class="btn btn-primary btn-sm camera-save-btn">
+                                    Guardar
+                                </button>
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm camera-delete-btn">
+                                    Apagar
+                                </button>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <p>Nenhuma cÃ¢mera configurada. Adicione entradas no arquivo <code>cameras.json</code>.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <hr class="my-4">
+                    <h3>ParÃ¢metros padrÃ£o</h3>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label for="frame_rate">Taxa de Quadros (FPS)</label>
-                            <input type="number" id="frame_rate" name="frame_rate" value="{{ config.camera.frame_rate }}">
+                            <input type="number" id="frame_rate" name="frame_rate" value="{{ config.camera_defaults.frame_rate }}">
                         </div>
                         <div class="form-group">
-                            <label for="reconnect_attempts">Tentativas de Reconexão</label>
-                            <input type="number" id="reconnect_attempts" name="reconnect_attempts" value="{{ config.camera.reconnect_attempts }}">
+                            <label for="reconnect_attempts">Tentativas de ReconexÃ£o</label>
+                            <input type="number" id="reconnect_attempts" name="reconnect_attempts" value="{{ config.camera_defaults.reconnect_attempts }}">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="buffer_size">Tamanho do Buffer</label>
-                        <input type="number" id="buffer_size" name="buffer_size" value="{{ config.camera.buffer_size }}">
+                        <input type="number" id="buffer_size" name="buffer_size" value="{{ config.camera_defaults.buffer_size }}">
                         <small>Tamanho do buffer em bytes</small>
                     </div>
                 </section>
 
-                <!-- Aba Detecção -->
+                <!-- Aba DetecÃ§Ã£o -->
                 <section id="deteccao" class="settings-section">
-                    <h2>Configurações de Detecção</h2>
+                    <h2>ConfiguraÃ§Ãµes de DetecÃ§Ã£o</h2>
                     
-                    <h3>Detecção de Movimento</h3>
+                    <h3>DetecÃ§Ã£o de Movimento</h3>
                     <div class="form-group">
                         <label class="toggle-switch">
                             <input type="checkbox" id="motion_enabled" name="motion_enabled" {% if config.motion_detection.enabled %}checked{% endif %}>
                             <span class="slider"></span>
                         </label>
-                        <label for="motion_enabled" style="display: inline; margin-left: 10px;">Detecção de Movimento Ativada</label>
+                        <label for="motion_enabled" style="display: inline; margin-left: 10px;">DetecÃ§Ã£o de Movimento Ativada</label>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="min_area">Área Mínima (pixels)</label>
+                            <label for="min_area">Ãrea MÃ­nima (pixels)</label>
                             <input type="number" id="min_area" name="min_area" value="{{ config.motion_detection.min_area }}">
                         </div>
                         <div class="form-group">
-                            <label for="var_threshold">Limiar de Variação</label>
+                            <label for="var_threshold">Limiar de VariaÃ§Ã£o</label>
                             <input type="number" id="var_threshold" name="var_threshold" value="{{ config.motion_detection.var_threshold }}">
                         </div>
                     </div>
 
-                    <h3>YOLOv8 - Detecção de Pessoas</h3>
+                    <h3>YOLOv8 - DetecÃ§Ã£o de Pessoas</h3>
                     <div class="form-group">
                         <label for="yolo_model">Modelo YOLO</label>
                         <select id="yolo_model" name="yolo_model">
                             <option value="yolov8n.pt" {% if config.yolo.model == 'yolov8n.pt' %}selected{% endif %}>YOLOv8n (Leve)</option>
                             <option value="yolov8s.pt" {% if config.yolo.model == 'yolov8s.pt' %}selected{% endif %}>YOLOv8s (Pequeno)</option>
-                            <option value="yolov8m.pt" {% if config.yolo.model == 'yolov8m.pt' %}selected{% endif %}>YOLOv8m (Médio)</option>
+                            <option value="yolov8m.pt" {% if config.yolo.model == 'yolov8m.pt' %}selected{% endif %}>YOLOv8m (MÃ©dio)</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="confidence">Confiança Mínima (%)</label>
+                        <label for="confidence">ConfianÃ§a MÃ­nima (%)</label>
                         <input type="range" id="confidence" name="confidence" min="0" max="100" value="{{ (config.yolo.confidence * 100) | int }}">
                         <span id="confidence-value">{{ (config.yolo.confidence * 100) | int }}%</span>
                     </div>
@@ -741,14 +857,14 @@
 
                 <!-- Aba Telegram -->
                 <section id="telegram" class="settings-section">
-                    <h2>Configurações do Telegram</h2>
+                    <h2>ConfiguraÃ§Ãµes do Telegram</h2>
                     
                     <div class="form-group">
                         <label class="toggle-switch">
                             <input type="checkbox" id="telegram_enabled" name="telegram_enabled" {% if config.telegram.enabled %}checked{% endif %}>
                             <span class="slider"></span>
                         </label>
-                        <label for="telegram_enabled" style="display: inline; margin-left: 10px;">Notificações Telegram Ativadas</label>
+                        <label for="telegram_enabled" style="display: inline; margin-left: 10px;">NotificaÃ§Ãµes Telegram Ativadas</label>
                     </div>
 
                     <div class="form-group">
@@ -774,20 +890,20 @@
                     <div class="form-group">
                         <label for="message_template">Template da Mensagem</label>
                         <textarea id="message_template" name="message_template" rows="4">{{ config.telegram.message_template }}</textarea>
-                        <small>Variáveis disponíveis: {location}, {timestamp}</small>
+                        <small>VariÃ¡veis disponÃ­veis: {location}, {timestamp}</small>
                     </div>
                 </section>
 
-                <!-- Aba Gravação -->
+                <!-- Aba GravaÃ§Ã£o -->
                 <section id="gravacao" class="settings-section">
-                    <h2>Configurações de Gravação</h2>
+                    <h2>ConfiguraÃ§Ãµes de GravaÃ§Ã£o</h2>
                     
                     <div class="form-group">
                         <label class="toggle-switch">
                             <input type="checkbox" id="recording_enabled" name="recording_enabled" {% if config.recording.enabled %}checked{% endif %}>
                             <span class="slider"></span>
                         </label>
-                        <label for="recording_enabled" style="display: inline; margin-left: 10px;">Gravação Ativada</label>
+                        <label for="recording_enabled" style="display: inline; margin-left: 10px;">GravaÃ§Ã£o Ativada</label>
                     </div>
 
                     <div class="form-group">
@@ -800,17 +916,17 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="record_duration">Duração da Gravação (segundos)</label>
+                            <label for="record_duration">DuraÃ§Ã£o da GravaÃ§Ã£o (segundos)</label>
                             <input type="number" id="record_duration" name="record_duration" value="{{ config.recording.record_duration }}">
                         </div>
                         <div class="form-group">
-                            <label for="max_storage">Armazenamento Máximo (GB)</label>
+                            <label for="max_storage">Armazenamento MÃ¡ximo (GB)</label>
                             <input type="number" id="max_storage" name="max_storage" value="{{ config.recording.max_storage_gb }}">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="video_codec">Codec de Vídeo</label>
+                        <label for="video_codec">Codec de VÃ­deo</label>
                         <select id="video_codec" name="video_codec">
                             <option value="mp4v" {% if config.recording.video_codec == 'mp4v' %}selected{% endif %}>MP4V</option>
                             <option value="XVID" {% if config.recording.video_codec == 'XVID' %}selected{% endif %}>XVID</option>
@@ -819,12 +935,12 @@
                     </div>
                 </section>
 
-                <!-- Aba Segurança -->
+                <!-- Aba SeguranÃ§a -->
                 <section id="seguranca" class="settings-section">
-                    <h2>Configurações de Segurança</h2>
+                    <h2>ConfiguraÃ§Ãµes de SeguranÃ§a</h2>
                     
                     <div class="form-group">
-                        <label for="username">Nome de Usuário</label>
+                        <label for="username">Nome de UsuÃ¡rio</label>
                         <input type="text" id="username" name="username" value="{{ config.security.username }}">
                     </div>
 
@@ -840,11 +956,11 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="session_timeout">Tempo de Sessão (segundos)</label>
+                            <label for="session_timeout">Tempo de SessÃ£o (segundos)</label>
                             <input type="number" id="session_timeout" name="session_timeout" value="{{ config.security.session_timeout }}">
                         </div>
                         <div class="form-group">
-                            <label for="max_attempts">Máximo de Tentativas de Login</label>
+                            <label for="max_attempts">MÃ¡ximo de Tentativas de Login</label>
                             <input type="number" id="max_attempts" name="max_attempts" value="{{ config.security.max_login_attempts }}">
                         </div>
                     </div>
@@ -852,12 +968,12 @@
 
                 <!-- Aba Sistema -->
                 <section id="sistema" class="settings-section">
-                    <h2>Configurações do Sistema</h2>
+                    <h2>ConfiguraÃ§Ãµes do Sistema</h2>
                     
                     <div class="form-group">
                         <label for="host">Host do Servidor</label>
                         <input type="text" id="host" name="host" value="{{ config.system.host }}">
-                        <small>Use 0.0.0.0 para aceitar conexões externas</small>
+                        <small>Use 0.0.0.0 para aceitar conexÃµes externas</small>
                     </div>
 
                     <div class="form-group">
@@ -866,7 +982,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="log_level">Nível de Log</label>
+                        <label for="log_level">NÃ­vel de Log</label>
                         <select id="log_level" name="log_level">
                             <option value="DEBUG" {% if config.logging.level == 'DEBUG' %}selected{% endif %}>DEBUG</option>
                             <option value="INFO" {% if config.logging.level == 'INFO' %}selected{% endif %}>INFO</option>
@@ -878,11 +994,11 @@
 
                 <!-- Aba Importar/Exportar -->
                 <section id="import-export" class="settings-section">
-                    <h2>Importar/Exportar Configurações</h2>
+                    <h2>Importar/Exportar ConfiguraÃ§Ãµes</h2>
                     
                     <div class="form-group">
-                        <h3>Exportar Configurações</h3>
-                        <p>Faça backup das suas configurações atuais</p>
+                        <h3>Exportar ConfiguraÃ§Ãµes</h3>
+                        <p>FaÃ§a backup das suas configuraÃ§Ãµes atuais</p>
                         <div class="settings-actions">
                             <a href="/api/config/export/json" class="btn btn-info">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
@@ -904,8 +1020,8 @@
                     </div>
 
                     <div class="form-group">
-                        <h3>Importar Configurações</h3>
-                        <p>Restaure configurações de um arquivo de backup</p>
+                        <h3>Importar ConfiguraÃ§Ãµes</h3>
+                        <p>Restaure configuraÃ§Ãµes de um arquivo de backup</p>
                         <form id="import-form" enctype="multipart/form-data">
                             <div class="file-input-wrapper">
                                 <button type="button" class="btn btn-warning" onclick="document.getElementById('import-file').click()">
@@ -924,20 +1040,20 @@
                             <polyline points="17 21 17 13 7 13 7 21"></polyline>
                             <polyline points="7 3 7 8 15 8"></polyline>
                         </svg>
-                        Salvar Configurações
+                        Salvar ConfiguraÃ§Ãµes
                     </button>
                         </form>
                     </div>
 
                     <div class="form-group">
-                        <h3>Configurações Padrão</h3>
-                        <p>Restaure as configurações originais do sistema</p>
+                        <h3>ConfiguraÃ§Ãµes PadrÃ£o</h3>
+                        <p>Restaure as configuraÃ§Ãµes originais do sistema</p>
                         <button type="button" class="btn btn-danger" onclick="resetToDefaults()">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
                                 <polyline points="23 4 23 10 17 10"></polyline>
                                 <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
                             </svg>
-                            Restaurar Padrões
+                            Restaurar PadrÃµes
                         </button>
                     </div>
                 </section>
@@ -949,7 +1065,7 @@
                             <polyline points="17 21 17 13 7 13 7 21"></polyline>
                             <polyline points="7 3 7 8 15 8"></polyline>
                         </svg>
-                        Salvar Alterações
+                        Salvar AlteraÃ§Ãµes
                     </button>
                     <button type="button" class="btn btn-warning" onclick="testTelegram()">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
@@ -963,15 +1079,47 @@
                             <circle cx="8" cy="10" r="2"></circle>
                             <path d="M16 10l2-2 2 2-2 2-2-2z"></path>
                         </svg>
-                        Testar Câmera
+                        Testar CÃ¢mera
                     </button>
                 </div>
             </main>
         </div>
     </div>
 
+    <div class="modal-overlay" id="add-camera-modal">
+        <div class="modal-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>Adicionar nova câmera</h3>
+                <button type="button" class="btn btn-sm btn-outline-light" id="btn-close-add-camera">&times;</button>
+            </div>
+            <form id="add-camera-form">
+                <div class="form-group">
+                    <label for="new-camera-name">Nome</label>
+                    <input type="text" id="new-camera-name" class="form-control" placeholder="Entrada Principal" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-camera-id">ID (opcional)</label>
+                    <input type="text" id="new-camera-id" class="form-control" placeholder="cam3">
+                    <small>Se vazio, será gerado automaticamente.</small>
+                </div>
+                <div class="form-group">
+                    <label for="new-camera-rtsp">URL RTSP</label>
+                    <input type="text" id="new-camera-rtsp" class="form-control" placeholder="rtsp://usuario:senha@ip:porta/stream" required>
+                </div>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="new-camera-enabled" checked>
+                    <label class="form-check-label" for="new-camera-enabled">Ativa</label>
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary" id="btn-cancel-add-camera">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Navegação entre abas
+        // NavegaÃ§Ã£o entre abas
         document.querySelectorAll('.menu-link').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -1000,47 +1148,246 @@
             if (confidenceSlider) {
                 confidenceSlider.style.setProperty('--value', confidenceSlider.value + '%');
             }
+            bindCameraEditors();
+            bindAddCameraModal();
         });
 
-        // Salvar configurações
+        function bindCameraEditors() {
+            document.querySelectorAll('.camera-card').forEach(card => {
+                const saveBtn = card.querySelector('.camera-save-btn');
+                const deleteBtn = card.querySelector('.camera-delete-btn');
+
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', () => {
+                        const camId = card.dataset.cameraId;
+                        const nameInput = card.querySelector('.camera-name');
+                        const rtspInput = card.querySelector('.camera-rtsp');
+                        const enabledToggle = card.querySelector('.camera-enabled');
+
+                        const payload = {
+                            name: nameInput ? nameInput.value.trim() : '',
+                            rtsp_url: rtspInput ? rtspInput.value.trim() : '',
+                            enabled: enabledToggle ? enabledToggle.checked : true
+                        };
+
+                        fetch(`/api/cameras/${camId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.error) {
+                                    alert(data.error);
+                                    return;
+                                }
+                                alert('Câmera atualizada com sucesso.');
+                            })
+                            .catch(() => alert('Erro ao atualizar câmera. Verifique a conexão.'));
+                    });
+                }
+
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', () => {
+                        const camId = card.dataset.cameraId;
+                        if (!confirm(`Remover a câmera ${camId}?`)) {
+                            return;
+                        }
+                        fetch(`/api/cameras/${camId}`, {
+                            method: 'DELETE'
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.error) {
+                                    alert(data.error);
+                                    return;
+                                }
+                                window.location.reload();
+                            })
+                            .catch(() => alert('Erro ao remover câmera. Verifique a conexão.'));
+                    });
+                }
+            });
+        }
+
+        function bindAddCameraModal() {
+            const modal = document.getElementById('add-camera-modal');
+            const openBtn = document.getElementById('btn-add-camera');
+            const closeBtn = document.getElementById('btn-close-add-camera');
+            const cancelBtn = document.getElementById('btn-cancel-add-camera');
+            const form = document.getElementById('add-camera-form');
+
+            const openModal = () => modal?.classList.add('active');
+            const closeModal = () => modal?.classList.remove('active');
+
+            openBtn?.addEventListener('click', openModal);
+            closeBtn?.addEventListener('click', closeModal);
+            cancelBtn?.addEventListener('click', closeModal);
+            modal?.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            form?.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const payload = {
+                    id: document.getElementById('new-camera-id')?.value.trim() || undefined,
+                    name: document.getElementById('new-camera-name')?.value.trim(),
+                    rtsp_url: document.getElementById('new-camera-rtsp')?.value.trim(),
+                    enabled: document.getElementById('new-camera-enabled')?.checked ?? true
+                };
+
+                fetch('/api/cameras', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                            return;
+                        }
+                        window.location.reload();
+                    })
+                    .catch(() => alert('Erro ao adicionar câmera. Verifique a conexão.'));
+            });
+        }
+
+
+        // Salvar configuraÃ§Ãµes
         function saveSettings() {
-            const formData = new FormData(document.querySelector('form') || document.body);
+            const parseNumber = (value) => {
+                const parsed = parseInt(value, 10);
+                return Number.isNaN(parsed) ? undefined : parsed;
+            };
+
+            const getNumberValue = (id) => {
+                const input = document.getElementById(id);
+                if (!input) return undefined;
+                return parseNumber(input.value);
+            };
+
+            const getTextValue = (id) => {
+                const input = document.getElementById(id);
+                if (!input) return undefined;
+                const value = input.value.trim();
+                return value === '' ? undefined : value;
+            };
+
+            const getCheckboxValue = (id) => {
+                const input = document.getElementById(id);
+                return input ? input.checked : undefined;
+            };
+
+            const addValue = (target, key, value) => {
+                if (value === undefined || value === null) return;
+                target[key] = value;
+            };
+
             const data = {};
-            
-            // Organizar dados por seção
-            data.camera = {
-                rtsp_url: document.getElementById('rtsp_url')?.value,
-                frame_rate: parseInt(document.getElementById('frame_rate')?.value),
-                reconnect_attempts: parseInt(document.getElementById('reconnect_attempts')?.value),
-                buffer_size: parseInt(document.getElementById('buffer_size')?.value)
-            };
-            
-            data.motion_detection = {
-                enabled: document.getElementById('motion_enabled')?.checked,
-                min_area: parseInt(document.getElementById('min_area')?.value),
-                var_threshold: parseInt(document.getElementById('var_threshold')?.value)
-            };
-            
-            data.yolo = {
-                model: document.getElementById('yolo_model')?.value,
-                confidence: parseInt(document.getElementById('confidence')?.value) / 100
-            };
-            
-            data.telegram = {
-                enabled: document.getElementById('telegram_enabled')?.checked,
-                bot_token: document.getElementById('bot_token')?.value,
-                chat_id: document.getElementById('chat_id')?.value,
-                send_screenshot: document.getElementById('send_screenshot')?.checked,
-                message_template: document.getElementById('message_template')?.value
-            };
-            
-            data.recording = {
-                enabled: document.getElementById('recording_enabled')?.checked,
-                record_on_person_detection: document.getElementById('record_on_person')?.checked,
-                record_duration: parseInt(document.getElementById('record_duration')?.value),
-                max_storage_gb: parseInt(document.getElementById('max_storage')?.value),
-                video_codec: document.getElementById('video_codec')?.value
-            };
+
+            const cameraDefaults = {};
+            addValue(cameraDefaults, 'frame_rate', getNumberValue('frame_rate'));
+            addValue(cameraDefaults, 'reconnect_attempts', getNumberValue('reconnect_attempts'));
+            addValue(cameraDefaults, 'buffer_size', getNumberValue('buffer_size'));
+            if (Object.keys(cameraDefaults).length) {
+                data.camera_defaults = cameraDefaults;
+            }
+
+            const motionSettings = {};
+            const motionEnabled = getCheckboxValue('motion_enabled');
+            if (motionEnabled !== undefined) {
+                motionSettings.enabled = motionEnabled;
+            }
+            addValue(motionSettings, 'min_area', getNumberValue('min_area'));
+            addValue(motionSettings, 'var_threshold', getNumberValue('var_threshold'));
+            if (Object.keys(motionSettings).length) {
+                data.motion_detection = motionSettings;
+            }
+
+            const yoloSettings = {};
+            addValue(yoloSettings, 'model', getTextValue('yolo_model'));
+            const confidenceInput = parseNumber(document.getElementById('confidence')?.value);
+            if (confidenceInput !== undefined) {
+                yoloSettings.confidence = confidenceInput / 100;
+            }
+            if (Object.keys(yoloSettings).length) {
+                data.yolo = yoloSettings;
+            }
+
+            const telegramSettings = {};
+            const telegramEnabled = getCheckboxValue('telegram_enabled');
+            if (telegramEnabled !== undefined) {
+                telegramSettings.enabled = telegramEnabled;
+            }
+            addValue(telegramSettings, 'bot_token', getTextValue('bot_token'));
+            addValue(telegramSettings, 'chat_id', getTextValue('chat_id'));
+            const sendScreenshot = getCheckboxValue('send_screenshot');
+            if (sendScreenshot !== undefined) {
+                telegramSettings.send_screenshot = sendScreenshot;
+            }
+            addValue(telegramSettings, 'message_template', document.getElementById('message_template')?.value);
+            if (Object.keys(telegramSettings).length) {
+                data.telegram = telegramSettings;
+            }
+
+            const recordingSettings = {};
+            const recordingEnabled = getCheckboxValue('recording_enabled');
+            if (recordingEnabled !== undefined) {
+                recordingSettings.enabled = recordingEnabled;
+            }
+            const recordOnPerson = getCheckboxValue('record_on_person');
+            if (recordOnPerson !== undefined) {
+                recordingSettings.record_on_person_detection = recordOnPerson;
+            }
+            addValue(recordingSettings, 'record_duration', getNumberValue('record_duration'));
+            addValue(recordingSettings, 'max_storage_gb', getNumberValue('max_storage'));
+            addValue(recordingSettings, 'video_codec', getTextValue('video_codec'));
+            if (Object.keys(recordingSettings).length) {
+                data.recording = recordingSettings;
+            }
+
+            const securitySettings = {};
+            addValue(securitySettings, 'username', getTextValue('username'));
+            addValue(securitySettings, 'session_timeout', getNumberValue('session_timeout'));
+            addValue(securitySettings, 'max_login_attempts', getNumberValue('max_attempts'));
+            const newPassword = getTextValue('new_password');
+            const confirmPassword = getTextValue('confirm_password');
+            if (newPassword) {
+                securitySettings.new_password = newPassword;
+                securitySettings.confirm_password = confirmPassword || '';
+            }
+            if (Object.keys(securitySettings).length) {
+                data.security = securitySettings;
+            }
+
+            const systemSettings = {};
+            addValue(systemSettings, 'host', getTextValue('host'));
+            addValue(systemSettings, 'port', getNumberValue('port'));
+            const debugMode = getCheckboxValue('debug_mode');
+            if (debugMode !== undefined) {
+                systemSettings.debug = debugMode;
+            }
+            if (Object.keys(systemSettings).length) {
+                data.system = systemSettings;
+            }
+
+            const loggingSettings = {};
+            addValue(loggingSettings, 'level', getTextValue('log_level'));
+            if (Object.keys(loggingSettings).length) {
+                data.logging = loggingSettings;
+            }
+
+            if (Object.keys(data).length === 0) {
+                alert('Nenhuma configuraÃ§Ã£o para salvar.');
+                return;
+            }
 
             fetch('/api/config', {
                 method: 'POST',
@@ -1052,35 +1399,39 @@
             .then(response => response.json())
             .then(result => {
                 if (result.status === 'success') {
-                    alert('✅ Configurações salvas com sucesso!');
+                    alert('Configuracoes salvas com sucesso!');
+                    ['new_password', 'confirm_password'].forEach(id => {
+                        const field = document.getElementById(id);
+                        if (field) field.value = '';
+                    });
                 } else {
-                    alert('❌ Erro ao salvar configurações: ' + (result.error || 'Erro desconhecido'));
+                    alert('Erro ao salvar configuracoes: ' + (result.error || 'Erro desconhecido'));
                 }
             })
             .catch(error => {
                 console.error('Erro:', error);
-                alert('❌ Erro ao salvar configurações');
+                alert('âŒ Erro ao salvar configuraÃ§Ãµes');
             });
         }
 
         // Testar Telegram
         function testTelegram() {
-            alert('📱 Teste de Telegram enviado! Verifique se recebeu a mensagem.');
+            alert('ðŸ“± Teste de Telegram enviado! Verifique se recebeu a mensagem.');
         }
 
-        // Testar Câmera
+        // Testar CÃ¢mera
         function testCamera() {
-            alert('📹 Teste de câmera iniciado! Verifique o dashboard principal.');
+            alert('ðŸ“¹ Teste de cÃ¢mera iniciado! Verifique o dashboard principal.');
         }
 
-        // Importar configurações
+        // Importar configuraÃ§Ãµes
         document.getElementById('import-form')?.addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData();
             const fileInput = document.getElementById('import-file');
             
             if (fileInput.files.length === 0) {
-                alert('❌ Por favor, selecione um arquivo');
+                alert('âŒ Por favor, selecione um arquivo');
                 return;
             }
             
@@ -1093,40 +1444,40 @@
             .then(response => response.json())
             .then(result => {
                 if (result.status === 'success') {
-                    alert('✅ Configurações importadas com sucesso! Recarregando página...');
+                    alert('âœ… ConfiguraÃ§Ãµes importadas com sucesso! Recarregando pÃ¡gina...');
                     setTimeout(() => location.reload(), 1500);
                 } else {
-                    alert('❌ Erro ao importar: ' + (result.error || 'Erro desconhecido'));
+                    alert('âŒ Erro ao importar: ' + (result.error || 'Erro desconhecido'));
                 }
             })
             .catch(error => {
                 console.error('Erro:', error);
-                alert('❌ Erro ao importar configurações');
+                alert('âŒ Erro ao importar configuraÃ§Ãµes');
             });
         });
 
-        // Restaurar padrões
+        // Restaurar padrÃµes
         function resetToDefaults() {
-            if (confirm('⚠️ Tem certeza que deseja restaurar as configurações padrões? Isso irá apagar suas configurações atuais.')) {
-                alert('🔄 Restauração de padrões não implementada nesta versão.');
+            if (confirm('âš ï¸ Tem certeza que deseja restaurar as configuraÃ§Ãµes padrÃµes? Isso irÃ¡ apagar suas configuraÃ§Ãµes atuais.')) {
+                alert('ðŸ”„ RestauraÃ§Ã£o de padrÃµes nÃ£o implementada nesta versÃ£o.');
             }
         }
 
-        // Carregar configurações atuais via API
+        // Carregar configuraÃ§Ãµes atuais via API
         function loadCurrentConfig() {
             fetch('/api/config')
                 .then(response => response.json())
                 .then(config => {
-                    console.log('Configurações carregadas:', config);
-                    // Aqui você pode preencher os formulários com os dados atuais
+                    console.log('ConfiguraÃ§Ãµes carregadas:', config);
+                    // Aqui vocÃª pode preencher os formulÃ¡rios com os dados atuais
                 })
                 .catch(error => console.error('Erro ao carregar config:', error));
         }
 
-        // Carregar configurações ao iniciar
+        // Carregar configuraÃ§Ãµes ao iniciar
         loadCurrentConfig();
 
-        // 🌟 FUNCIONALIDADE DE TROCA DE TEMA
+        // ðŸŒŸ FUNCIONALIDADE DE TROCA DE TEMA
         const themeToggle = document.getElementById('theme-toggle');
         const themeText = document.getElementById('theme-text');
         const body = document.body;
@@ -1138,7 +1489,7 @@
             updateThemeButton(true);
         }
 
-        // Alternar tema ao clicar no botão
+        // Alternar tema ao clicar no botÃ£o
         themeToggle.addEventListener('click', function() {
             const isLightTheme = body.classList.toggle('light-theme');
             
@@ -1151,7 +1502,7 @@
             }
         });
 
-        // Atualizar texto e ícone do botão
+        // Atualizar texto e Ã­cone do botÃ£o
         function updateThemeButton(isLight) {
             if (isLight) {
                 themeText.textContent = 'Tema Escuro';
@@ -1180,7 +1531,7 @@
             }
         }
 
-        // Detectar preferência do sistema automaticamente (apenas se não houver tema salvo)
+        // Detectar preferÃªncia do sistema automaticamente (apenas se nÃ£o houver tema salvo)
         if (!savedTheme) {
             const prefersLightScheme = window.matchMedia('(prefers-color-scheme: light)');
             if (prefersLightScheme.matches) {
@@ -1188,7 +1539,7 @@
                 updateThemeButton(true);
             }
             
-            // Ouvir mudanças na preferência do sistema
+            // Ouvir mudanÃ§as na preferÃªncia do sistema
             prefersLightScheme.addEventListener('change', function(e) {
                 if (!localStorage.getItem('theme')) {
                     if (e.matches) {
@@ -1202,16 +1553,16 @@
             });
         }
 
-        // 🎯 CORRIGIR FUNDO BRANCO DO MAIN - GARANTIR FUNDO ESCURO
+        // ðŸŽ¯ CORRIGIR FUNDO BRANCO DO MAIN - GARANTIR FUNDO ESCURO
         function fixMainBackground() {
             const mainPanel = document.querySelector('main.settings-panel');
             if (mainPanel && !body.classList.contains('light-theme')) {
-                // Forçar fundo escuro no tema padrão
+                // ForÃ§ar fundo escuro no tema padrÃ£o
                 mainPanel.style.backgroundColor = '#1f2937';
                 mainPanel.style.color = '#f9fafb';
                 mainPanel.style.background = '#1f2937';
                 
-                // Garantir que todos os filhos não herdem fundo branco
+                // Garantir que todos os filhos nÃ£o herdem fundo branco
                 const children = mainPanel.querySelectorAll('*');
                 children.forEach(child => {
                     if (child.tagName !== 'INPUT' && child.tagName !== 'SELECT' && child.tagName !== 'TEXTAREA' && child.tagName !== 'BUTTON') {
@@ -1219,28 +1570,31 @@
                     }
                 });
                 
-                console.log('✅ Fundo do main corrigido para escuro');
+                console.log('âœ… Fundo do main corrigido para escuro');
             } else if (mainPanel && body.classList.contains('light-theme')) {
                 // No tema claro, garantir fundo branco
                 mainPanel.style.backgroundColor = '';
                 mainPanel.style.color = '';
                 mainPanel.style.background = '';
-                console.log('✅ Fundo do main ajustado para tema claro');
+                console.log('âœ… Fundo do main ajustado para tema claro');
             }
         }
 
-        // Aplicar correção ao carregar a página
+        // Aplicar correÃ§Ã£o ao carregar a pÃ¡gina
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(fixMainBackground, 100); // Pequeno delay para garantir que tudo carregou
         });
 
-        // Aplicar correção quando mudar de tema
+        // Aplicar correÃ§Ã£o quando mudar de tema
         themeToggle.addEventListener('click', function() {
             setTimeout(fixMainBackground, 50);
         });
 
-        // Aplicar correção periodicamente (backup)
+        // Aplicar correÃ§Ã£o periodicamente (backup)
         setInterval(fixMainBackground, 1000); // Verificar a cada segundo
     </script>
 </body>
 </html>
+
+
+

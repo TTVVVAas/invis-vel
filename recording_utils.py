@@ -5,6 +5,7 @@ Utilitários para gerenciamento de gravações por data
 import os
 from datetime import datetime
 import logging
+from config import RECORDING
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,8 @@ def get_month_name(month_num):
 
 def get_recordings_base_path():
     """Retorna o caminho base para gravações"""
-    return 'recordings'
+    base_path = RECORDING.get('storage_path', 'recordings')
+    return base_path.rstrip('/\\')
 
 def get_recording_path_for_date(date=None):
     """

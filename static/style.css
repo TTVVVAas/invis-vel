@@ -1,180 +1,153 @@
-/* Tema Escuro Liso - Centro de Monitoramento IA */
-
-/* Reset e estilos base */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html, body {
-    max-width: 100vw;
-    overflow-x: hidden;
-    background-color: #111827;
-    color: #f9fafb;
+/* === Reset leve para garantir compatibilidade com Bootstrap === */
+body {
+    background-color: #0d1117;
+    color: #f0f0f0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    min-height: 100vh;
 }
 
-/* Container */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-/* Header */
-header {
-    background-color: #1f2937;
-    padding: 20px;
-    font-size: 24px;
-    font-weight: 600;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 0 0 12px 12px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #374151;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-/* Títulos */
-h1, h2, h3, h4, h5, h6 {
-    color: inherit;
-}
-
-.white-panel h1,
-.white-panel h2,
-.white-panel h3,
-.white-panel h4,
-.white-panel h5,
-.white-panel h6 {
-    color: #111 !important;
-}
-
-.dark-panel h1,
-.dark-panel h2,
-.dark-panel h3,
-.dark-panel h4,
-.dark-panel h5,
-.dark-panel h6 {
-    color: #cbd5e1;
-}
-
-/* Painéis */
-.bg-white-panel, .demo-white-panel,
-.bg-light-panel, .bg-dark-panel,
-.bg-darker-panel {
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin: 20px 0;
-}
-
-.bg-white-panel, .bg-light-panel {
-    background-color: #f9fafb;
-    color: #111827;
-}
-
-.bg-dark-panel, .bg-darker-panel, .demo-white-panel {
-    background-color: #1f2937;
-    color: #f9fafb;
-}
-
-/* Layout principal */
-.main-content {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    align-items: flex-start;
-    flex-wrap: wrap;
-}
-
-.video-section {
-    flex: 1;
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: #1f2937;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-.sidebar {
-    width: 300px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.panel {
-    background: #1f2937;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-/* Responsivo */
-@media (max-width: 768px) {
-    .main-content {
-        flex-direction: column;
-        align-items: center;
-    }
-    .sidebar {
-        width: 100%;
-        max-width: 400px;
-    }
-    .video-section {
-        width: 100%;
-    }
-    header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-    .nav-menu {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-}
-
-/* Botões genéricos */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 16px;
-    margin: 8px 0;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: inherit;
-    text-align: center;
+a {
+    color: #58a6ff;
     text-decoration: none;
-    width: 100%;
 }
 
+a:hover {
+    text-decoration: underline;
+}
+
+/* === Estilo dos cards personalizados === */
+.card {
+    background-color: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* === Cabecalhos dentro dos cards === */
+.card-header {
+    background-color: #21262d;
+    border-bottom: 1px solid #30363d;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #f0f6fc;
+}
+
+/* === Botoes customizados === */
 .btn-primary {
-    background: #3b82f6;
-    color: white;
+    background-color: #238636;
+    border-color: #2ea043;
 }
 
 .btn-primary:hover {
-    background: #2563eb;
+    background-color: #2ea043;
+    border-color: #3fb950;
 }
 
-.btn-danger {
-    background: #ef4444;
-    color: white;
+/* === Texto informativo e estados === */
+.badge-online {
+    background-color: #238636;
+    color: #ffffff;
 }
 
-.btn-danger:hover {
-    background: #dc2626;
+.badge-offline {
+    background-color: #da3633;
+    color: #ffffff;
 }
 
-/* E muito mais com o mesmo padrão visual */
+.status-ok {
+    color: #3fb950;
+    font-weight: bold;
+}
+
+.status-fail {
+    color: #f85149;
+    font-weight: bold;
+}
+
+/* === Estilo da imagem da camera (stream) === */
+img.cam-stream {
+    max-width: 100%;
+    border-radius: 10px;
+    border: 2px solid #30363d;
+}
+
+/* === Espacamentos e layout === */
+.section-title {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #c9d1d9;
+}
+
+.mt-4 {
+    margin-top: 1.5rem !important;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+/* === Alertas salvos e lista de gravacoes === */
+.alert-list,
+.recordings-list {
+    background-color: #161b22;
+    padding: 10px;
+    border-radius: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* === Rodape (se tiver) === */
+footer {
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.9rem;
+    color: #8b949e;
+}
+
+/* === Scrollbar estilizado (opcional) === */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0d1117;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #30363d;
+    border-radius: 10px;
+}
+
+/* === Modal simples === */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+    background-color: #161b22;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    width: min(500px, 90%);
+    color: #f0f0f0;
+}
+
+.modal .close {
+    color: #f0f0f0;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal .close:hover {
+    color: #58a6ff;
+}

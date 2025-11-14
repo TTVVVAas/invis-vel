@@ -1,0 +1,16 @@
+﻿{
+    "cameras": [
+        {
+            "id": "cam1",
+            "name": "Entrada Principal",
+            "rtsp": "rtsp://tiago123.serveftp.com:554/h264",
+            "enabled": true
+        },
+        {
+            "id": "cam2",
+            "name": "Garagem",
+            "rtsp": "rtsp://tiago123.serveftp.com:555/h264",
+            "enabled": true
+        }
+    ]
+}

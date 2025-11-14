@@ -1,22 +1,14 @@
-import cv2
-import numpy as np
-import json
-import yaml
-import os
-from datetime import datetime
-from flask import Flask, render_template, Response, request, jsonify, redirect, url_for, session, send_file
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from datetime import datetime
-import cv2
-import threading
-import time
-import os
-import json
+﻿import json
 import logging
-from logging.handlers import RotatingFileHandler
+import os
+import time
 import yaml
+from datetime import datetime
+from flask import Flask, render_template, Response, request, jsonify, redirect, url_for, session, send_file, abort
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from ultralytics import YOLO
+from ultralytics import YOLO as YOLOModel
+
 from alerts import get_alert_manager
 from recording_utils import (
     get_recordings_base_path, get_recording_path_for_date,
@@ -24,9 +16,12 @@ from recording_utils import (
     get_all_recordings, get_recordings_by_year_month, get_recordings_by_date,
     format_file_size, parse_recording_filename
 )
-
 app = Flask(__name__)
 from config import *
+from config_loader import (
+    get_cameras as load_cameras_from_store,
+    update_camera as persist_camera_update
+)
 app.secret_key = SECRET_KEY
 
 login_manager = LoginManager()
@@ -35,6 +30,7 @@ login_manager.login_view = 'login'
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+start_time = time.time()
 
 class User(UserMixin):
     def __init__(self, id, username, password_hash):
@@ -42,9 +38,22 @@ class User(UserMixin):
         self.username = username
         self.password_hash = password_hash
 
-users = {
-    'admin': User('1', 'admin', generate_password_hash('admin123'))
-}
+users = {}
+
+def refresh_user_store(username=None, password_hash=None):
+    """Atualiza o dicionário de usuários com base nas configurações atuais."""
+    username = username or SECURITY.get('username', 'admin')
+    stored_hash = password_hash or SECURITY.get('password_hash')
+
+    if not stored_hash:
+        # Garante um hash padrão caso não exista (senha de fábrica)
+        stored_hash = generate_password_hash('admin123')
+        SECURITY['password_hash'] = stored_hash
+
+    users.clear()
+    users[username] = User('1', username, stored_hash)
+
+refresh_user_store()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -53,157 +62,101 @@ def load_user(user_id):
             return user
     return None
 
-class CameraStream:
-    def __init__(self, rtsp_url=None):
-        self.rtsp_url = rtsp_url or 'rtsp://usuario:senha@ip_da_camera:554/stream'
-        self.cap = None
-        self.frame = None
-        self.running = False
-        self.lock = threading.Lock()
-        self.background_subtractor = cv2.createBackgroundSubtractorMOG2(history=500, varThreshold=16, detectShadows=True)
-        self.motion_detected = False
-        self.person_detected = False
-        self.last_detection_time = 0
-        self.detection_cooldown = 2  # segundos
-        
-        try:
-            self.yolo_model = YOLO('yolov8n.pt')
-            logger.info("YOLOv8 carregado com sucesso")
-        except Exception as e:
-            logger.error(f"Erro ao carregar YOLOv8: {e}")
-            self.yolo_model = None
-        
-        self.start_stream()
-    
-    def start_stream(self):
-        if self.cap is None or not self.cap.isOpened():
-            try:
-                self.cap = cv2.VideoCapture(self.rtsp_url)
-                if self.cap.isOpened():
-                    logger.info("Conexão RTSP estabelecida com sucesso")
-                    self.running = True
-                    threading.Thread(target=self.update_frame, daemon=True).start()
-                else:
-                    logger.error("Falha ao conectar com a câmera RTSP")
-            except Exception as e:
-                logger.error(f"Erro ao iniciar stream: {e}")
-    
-    def update_frame(self):
-        while self.running:
-            if self.cap and self.cap.isOpened():
-                ret, frame = self.cap.read()
-                if ret:
-                    with self.lock:
-                        self.frame = self.process_frame(frame)
-                else:
-                    logger.warning("Frame não recebido, tentando reconectar...")
-                    self.reconnect()
-            else:
-                self.reconnect()
-            time.sleep(0.033)  # ~30 FPS
-    
-    def reconnect(self):
-        try:
-            if self.cap:
-                self.cap.release()
-            time.sleep(2)
-            self.cap = cv2.VideoCapture(self.rtsp_url)
-            if self.cap.isOpened():
-                logger.info("Reconexão bem-sucedida")
-            else:
-                logger.error("Falha na reconexão")
-        except Exception as e:
-            logger.error(f"Erro ao reconectar: {e}")
-    
-    def process_frame(self, frame):
-        current_time = time.time()
-        
-        # Detecção de movimento
-        fg_mask = self.background_subtractor.apply(frame)
-        contours, _ = cv2.findContours(fg_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        
-        motion_detected_now = False
-        person_detected_now = False
-        
-        for contour in contours:
-            area = cv2.contourArea(contour)
-            if area > 500:  # Área mínima para considerar movimento
-                motion_detected_now = True
-                
-                # Detecção de pessoa com YOLOv8
-                if self.yolo_model and (current_time - self.last_detection_time) > self.detection_cooldown:
-                    try:
-                        results = self.yolo_model(frame, conf=0.5, classes=[0])  # Classe 0 = pessoa
-                        if len(results[0].boxes) > 0:
-                            person_detected_now = True
-                            self.last_detection_time = current_time
-                            
-                            # Desenhar caixas delimitadoras
-                            for box in results[0].boxes:
-                                x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
-                                cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-                                cv2.putText(frame, 'Pessoa', (int(x1), int(y1)-10), 
-                                          cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
-                            
-                            # Salvar imagem de alerta
-                            self.save_alert_image(frame)
-                            break
-                    except Exception as e:
-                        logger.error(f"Erro na detecção YOLO: {e}")
-        
-        self.motion_detected = motion_detected_now
-        self.person_detected = person_detected_now
-        
-        # Adicionar informações na tela
-        status_text = "Status: "
-        if self.person_detected:
-            status_text += "PESSOA DETECTADA"
-            color = (0, 0, 255)
-        elif self.motion_detected:
-            status_text += "MOVIMENTO DETECTADO"
-            color = (0, 255, 255)
-        else:
-            status_text += "MONITORANDO"
-            color = (0, 255, 0)
-        
-        cv2.putText(frame, status_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
-        cv2.putText(frame, datetime.now().strftime("%d/%m/%Y %H:%M:%S"), (10, 60), 
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
-        
-        # Enviar frame para gravação se estiver ativada
-        alert_manager = get_alert_manager()
-        alert_manager.recorder.write_frame(frame)
-        
-        return frame
-    
-    def save_alert_image(self, frame):
-        try:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"alerts/alerta_{timestamp}.jpg"
-            cv2.imwrite(filename, frame)
-            logger.info(f"Imagem de alerta salva: {filename}")
-            
-            # Disparar alerta completo
-            alert_manager = get_alert_manager()
-            alert_manager.trigger_alert(frame, "person", "Câmera Principal")
-            
-        except Exception as e:
-            logger.error(f"Erro ao salvar imagem de alerta: {e}")
-    
-    def get_frame(self):
-        with self.lock:
-            if self.frame is not None:
-                _, buffer = cv2.imencode('.jpg', self.frame)
-                return buffer.tobytes()
-        return None
-    
-    def stop(self):
-        self.running = False
-        if self.cap:
-            self.cap.release()
 
-# Inicializar câmera (configurar URL RTSP aqui)
-camera = CameraStream('rtsp://usuario:senha@ip_da_camera:554/stream')
+from camera_manager import CameraManager
+
+# Inicializar cameras (configuracoes vindas de config.py)
+camera_manager = CameraManager()
+
+CONFIG_SECTIONS = {
+    'camera_defaults': CAMERA_DEFAULTS,
+    'motion_detection': MOTION_DETECTION,
+    'yolo': YOLO,
+    'system': SYSTEM,
+    'security': SECURITY,
+    'telegram': TELEGRAM,
+    'recording': RECORDING,
+    'ip_whitelist': IP_WHITELIST,
+    'schedule': SCHEDULE,
+    'logging': LOGGING,
+    'performance': PERFORMANCE
+}
+
+
+def get_camera_entries():
+    """Retorna uma lista padronizada das câmeras configuradas."""
+    return load_cameras_from_store()
+
+
+def sanitize_security_payload(payload):
+    updates = {}
+    username = payload.get('username')
+    if username:
+        updates['username'] = username
+
+    session_timeout = payload.get('session_timeout')
+    if session_timeout is not None:
+        try:
+            updates['session_timeout'] = int(session_timeout)
+        except (TypeError, ValueError):
+            return None, 'Tempo de sessão inválido'
+
+    max_attempts = payload.get('max_login_attempts')
+    if max_attempts is not None:
+        try:
+            updates['max_login_attempts'] = int(max_attempts)
+        except (TypeError, ValueError):
+            return None, 'Máximo de tentativas inválido'
+
+    new_password = payload.get('new_password')
+    confirm_password = payload.get('confirm_password')
+    if new_password:
+        if not confirm_password or new_password != confirm_password:
+            return None, 'As senhas não conferem'
+        updates['password_hash'] = generate_password_hash(new_password)
+
+    return updates, None
+
+
+def prepare_config_payload(data):
+    processed = {}
+    if not isinstance(data, dict):
+        return processed, None
+
+    for key in CONFIG_SECTIONS.keys():
+        section = data.get(key)
+        if isinstance(section, dict):
+            processed[key] = section
+
+    if 'security' in processed:
+        updates, error = sanitize_security_payload(processed['security'])
+        if error:
+            return None, error
+        if updates:
+            processed['security'] = updates
+        else:
+            processed.pop('security', None)
+
+    return processed, None
+
+
+def apply_configuration_updates(payload):
+    changed = set()
+    for key, target in CONFIG_SECTIONS.items():
+        section = payload.get(key)
+        if isinstance(section, dict):
+            target.update(section)
+            changed.add(key)
+    return changed
+
+
+def handle_config_side_effects(changed_sections):
+    if {'camera_defaults', 'motion_detection', 'yolo'} & changed_sections:
+        camera_manager.apply_config()
+    if {'recording', 'telegram'} & changed_sections:
+        get_alert_manager().refresh_from_config()
+    if 'security' in changed_sections:
+        refresh_user_store()
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -240,34 +193,70 @@ def recordings():
 @app.route('/')
 @login_required
 def index():
-    return render_template('index.html')
+    return render_template('index.html', cameras=get_camera_entries())
 
-def generate_frames():
-    while True:
-        frame = camera.get_frame()
-        if frame:
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        else:
-            time.sleep(0.1)
 
 @app.route('/video_feed')
 @login_required
-def video_feed():
-    return Response(generate_frames(),
-                   mimetype='multipart/x-mixed-replace; boundary=frame')
+def default_video_feed():
+    camera_id = request.args.get('camera_id')
+    stream = camera_manager.get_stream(camera_id) if camera_id else camera_manager.get_default_stream()
+    if not stream:
+        abort(404)
+    return Response(stream.generate_frames(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/video_feed/<camera_id>')
+@login_required
+def video_feed(camera_id):
+    stream = camera_manager.get_stream(camera_id)
+    if not stream:
+        abort(404)
+    return Response(stream.generate_frames(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/status')
 @login_required
 def status():
     alert_manager = get_alert_manager()
     alert_stats = alert_manager.get_alert_stats()
-    
+    camera_statuses = camera_manager.get_all_statuses()
+    camera_list = list(camera_statuses.values())
+
+    def aggregate(field):
+        return any(status.get(field) for status in camera_list)
+
+    def sum_field(field):
+        return sum(status.get(field, 0) for status in camera_list)
+
+    ai_last_ts = 0
+    for status in camera_list:
+        ts = status.get('last_inference_ts') or 0
+        if ts and ts > ai_last_ts:
+            ai_last_ts = ts
+
+    ai_last_timestamp = datetime.fromtimestamp(ai_last_ts).strftime("%d/%m/%Y %H:%M:%S") if ai_last_ts else None
+    total_detections = sum(status.get('detection_count', 0) for status in camera_list)
+    avg_fps = 0.0
+    if camera_list:
+        fps_sum = sum(float(status.get('frame_rate') or 0) for status in camera_list)
+        avg_fps = round(fps_sum / len(camera_list), 2)
+
     return jsonify({
-        'motion_detected': camera.motion_detected,
-        'person_detected': camera.person_detected,
+        'cameras': camera_list,
+        'motion_detected': aggregate('motion_detected'),
+        'person_detected': aggregate('person_detected'),
         'timestamp': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-        'alert_stats': alert_stats
+        'alert_stats': alert_stats,
+        'motion_count': sum_field('motion_events'),
+        'person_count': sum_field('person_events'),
+        'alert_count': alert_stats.get('total_alerts', 0),
+        'camera_connected': all(status.get('connected') for status in camera_list) if camera_list else False,
+        'is_recording': alert_stats.get('is_recording'),
+        'ai_last_timestamp': ai_last_timestamp,
+        'total_detections': total_detections,
+        'avg_fps': avg_fps
     })
 
 @app.route('/alerts')
@@ -334,15 +323,83 @@ def serve_alert_image(filename):
 @login_required
 def config():
     if request.method == 'POST':
+        camera_id = request.form.get('camera_id')
         new_url = request.form.get('rtsp_url')
-        if new_url:
-            camera.rtsp_url = new_url
-            camera.stop()
-            camera.start_stream()
-            return jsonify({'status': 'success', 'message': 'Configuração atualizada'})
-    
-    return jsonify({'rtsp_url': camera.rtsp_url})
+        if camera_id and new_url:
+            updated = camera_manager.update_camera(camera_id, {'rtsp_url': new_url})
+            if updated:
+                return jsonify({'status': 'success', 'camera': updated})
+        return jsonify({'error': 'Camera ou URL invalida'}), 400
 
+    return jsonify({'cameras': get_camera_entries()})
+
+
+@app.route('/api/cameras', methods=['GET'])
+@login_required
+def api_list_cameras():
+    return jsonify({'cameras': get_camera_entries()})
+
+
+@app.route('/api/cameras', methods=['POST'])
+@login_required
+def api_add_camera():
+    data = request.get_json() or {}
+    name = (data.get('name') or '').strip()
+    rtsp_url = (data.get('rtsp_url') or data.get('rtsp') or '').strip()
+    camera_id = (data.get('id') or data.get('camera_id') or '').strip() or None
+    enabled = bool(data.get('enabled', True))
+
+    if not name or not rtsp_url:
+        return jsonify({'error': 'Nome e RTSP são obrigatórios'}), 400
+
+    payload = {
+        'id': camera_id,
+        'name': name,
+        'rtsp_url': rtsp_url,
+        'enabled': enabled
+    }
+    try:
+        new_camera = camera_manager.add_camera(payload)
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
+
+    return jsonify({'status': 'success', 'camera': new_camera}), 201
+
+
+@app.route('/api/cameras/<camera_id>', methods=['PUT'])
+@login_required
+def api_update_camera(camera_id):
+    data = request.get_json() or {}
+    payload = {}
+
+    name = data.get('name')
+    if name is not None:
+        payload['name'] = name.strip()
+
+    rtsp_url = data.get('rtsp_url') or data.get('rtsp')
+    if rtsp_url is not None:
+        payload['rtsp_url'] = rtsp_url.strip()
+
+    if 'enabled' in data:
+        payload['enabled'] = bool(data['enabled'])
+
+    if not payload:
+        return jsonify({'error': 'Nenhuma alteração fornecida'}), 400
+
+    updated = camera_manager.update_camera(camera_id, payload)
+    if not updated:
+        return jsonify({'error': 'Câmera não encontrada'}), 404
+
+    return jsonify({'status': 'success', 'camera': updated})
+
+
+@app.route('/api/cameras/<camera_id>', methods=['DELETE'])
+@login_required
+def api_delete_camera(camera_id):
+    success = camera_manager.delete_camera(camera_id)
+    if not success:
+        return jsonify({'error': 'Câmera não encontrada'}), 404
+    return jsonify({'status': 'success'})
 # ===== ROTAS DE CONFIGURAÇÕES =====
 @app.route('/settings')
 @login_required
@@ -361,27 +418,23 @@ def get_config():
 def update_config():
     """API: Atualizar configurações"""
     try:
-        data = request.get_json()
-        if not data:
-            return jsonify({'error': 'Dados inválidos'}), 400
-        
-        # Atualizar configurações (simplificado - apenas algumas chaves)
-        if 'camera' in data:
-            CAMERA.update(data['camera'])
-        if 'motion_detection' in data:
-            MOTION_DETECTION.update(data['motion_detection'])
-        if 'yolo' in data:
-            YOLO.update(data['yolo'])
-        if 'telegram' in data:
-            TELEGRAM.update(data['telegram'])
-        if 'recording' in data:
-            RECORDING.update(data['recording'])
-        
-        return jsonify({'status': 'success', 'message': 'Configurações atualizadas'})
+        data = request.get_json() or {}
+        processed_payload, error = prepare_config_payload(data)
+        if error:
+            return jsonify({'error': error}), 400
+        if not processed_payload:
+            return jsonify({'error': 'Nenhuma configuração válida fornecida'}), 400
+
+        changed_sections = apply_configuration_updates(processed_payload)
+        handle_config_side_effects(changed_sections)
+
+        return jsonify({
+            'status': 'success',
+            'updated_sections': sorted(changed_sections)
+        })
     except Exception as e:
         logger.error(f"Erro ao atualizar configurações: {e}")
         return jsonify({'error': 'Erro ao atualizar configurações'}), 500
-
 @app.route('/api/config/export/<format>')
 @login_required
 def export_config(format):
@@ -409,38 +462,43 @@ def export_config(format):
 
 @app.route('/api/config/import', methods=['POST'])
 @login_required
+
 def import_config():
     """Importar configurações de JSON ou YAML"""
     try:
         if 'file' not in request.files:
             return jsonify({'error': 'Nenhum arquivo enviado'}), 400
-        
+
         file = request.files['file']
         if file.filename == '':
             return jsonify({'error': 'Nenhum arquivo selecionado'}), 400
-        
-        # Ler arquivo
+
         content = file.read().decode('utf-8')
-        
-        # Detectar formato e processar
+
         if file.filename.endswith('.json'):
             config_data = json.loads(content)
         elif file.filename.endswith(('.yaml', '.yml')):
             config_data = yaml.safe_load(content)
         else:
             return jsonify({'error': 'Formato de arquivo não suportado'}), 400
-        
-        # Aplicar configurações (com validação básica)
-        if isinstance(config_data, dict):
-            # Atualizar configurações globais (exemplo simplificado)
-            if 'camera' in config_data:
-                CAMERA.update(config_data['camera'])
-            # Adicionar mais atualizações conforme necessário
-            
-            return jsonify({'status': 'success', 'message': 'Configurações importadas com sucesso'})
-        else:
+
+        if not isinstance(config_data, dict):
             return jsonify({'error': 'Formato de configuração inválido'}), 400
-            
+
+        processed_payload, error = prepare_config_payload(config_data)
+        if error:
+            return jsonify({'error': error}), 400
+        if not processed_payload:
+            return jsonify({'error': 'Nenhuma configuração válida encontrada no arquivo'}), 400
+
+        changed_sections = apply_configuration_updates(processed_payload)
+        handle_config_side_effects(changed_sections)
+
+        return jsonify({
+            'status': 'success',
+            'updated_sections': sorted(changed_sections)
+        })
+
     except json.JSONDecodeError:
         return jsonify({'error': 'Arquivo JSON inválido'}), 400
     except yaml.YAMLError:
@@ -614,18 +672,18 @@ def api_system_status():
     try:
         alert_manager = get_alert_manager()
         alert_stats = alert_manager.get_alert_stats()
+        camera_statuses = camera_manager.get_all_statuses()
         
         # Informações do sistema
         import psutil
+        total_motion = sum(status.get('motion_events', 0) for status in camera_statuses.values())
+        total_person = sum(status.get('person_events', 0) for status in camera_statuses.values())
         
         system_info = {
-            'camera': {
-                'connected': camera.connected if hasattr(camera, 'connected') else False,
-                'rtsp_url': camera.rtsp_url if hasattr(camera, 'rtsp_url') else 'N/A'
-            },
+            'cameras': list(camera_statuses.values()),
             'detection': {
                 'motion_enabled': MOTION_DETECTION['enabled'],
-                'yolo_enabled': True,  # Sempre ativo se o modelo estiver carregado
+                'yolo_enabled': any(status.get('yolo_active') for status in camera_statuses.values()),
                 'confidence': YOLO['confidence']
             },
             'alerts': alert_stats,
@@ -635,9 +693,15 @@ def api_system_status():
                 'disk_free': psutil.disk_usage('.').free // (1024**3),  # GB
                 'uptime': time.time() - start_time if 'start_time' in globals() else 0
             },
+            'counts': {
+                'motion': total_motion,
+                'person': total_person,
+                'alerts': alert_stats.get('total_alerts', 0)
+            },
             'config': {
                 'telegram_enabled': TELEGRAM['enabled'],
-                'recording_enabled': RECORDING['enabled']
+                'recording_enabled': RECORDING['enabled'],
+                'recording_active': alert_stats.get('is_recording', False)
             }
         }
         
@@ -650,7 +714,8 @@ def api_system_status():
 def get_config_data():
     """Obter configurações atuais para exibição"""
     return {
-        'camera': CAMERA,
+        'camera_defaults': CAMERA_DEFAULTS,
+        'cameras': get_camera_entries(),
         'motion_detection': MOTION_DETECTION,
         'yolo': YOLO,
         'system': SYSTEM,
@@ -672,10 +737,14 @@ if __name__ == '__main__':
     if not os.path.exists('yolov8n.pt'):
         logger.info("Baixando modelo YOLOv8n...")
         try:
-            model = YOLO('yolov8n.pt')
+            model = YOLOModel('yolov8n.pt')
             logger.info("Modelo YOLOv8n baixado com sucesso")
         except Exception as e:
             logger.error(f"Erro ao baixar modelo YOLOv8: {e}")
     
     logger.info("Iniciando servidor Flask...")
     app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)
+
+
+
+
